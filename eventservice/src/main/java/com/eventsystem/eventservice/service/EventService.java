@@ -3,10 +3,12 @@ package com.eventsystem.eventservice.service;
 import com.eventsystem.eventservice.model.Event;
 import com.eventsystem.eventservice.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class EventService {
 
     @Autowired
