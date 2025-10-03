@@ -4,6 +4,9 @@ from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from dotenv import load_dotenv
+import httpx
+import py_eureka_client.eureka_client as eureka_client
+import socket
 
 # Load environment variables (like the MongoDB URI)
 load_dotenv()
@@ -70,5 +73,14 @@ def get_user(id):
     return jsonify({"error": "User not found"}), 404
 
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+userServicPort = 5001
+
+eureka_client.init(
+    eureka_server="http://localhost:8761/eureka/",
+    app_name="user-serice",
+    instance_port=userServicPort,
+    instance_ip= socket.gethostbyname(socket.gethostname())
+)
+
+if __name__ == '__main__':
+    app.run(host='localhost', debug=True, port=userServicPort)
