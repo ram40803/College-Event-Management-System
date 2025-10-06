@@ -1,4 +1,4 @@
-package com.eventsystem.eventservice.model;
+package com.college.event_service.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

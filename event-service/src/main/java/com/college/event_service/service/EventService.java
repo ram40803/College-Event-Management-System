@@ -1,7 +1,7 @@
-package com.eventsystem.eventservice.service;
+package com.college.event_service.service;
 
-import com.eventsystem.eventservice.model.Event;
-import com.eventsystem.eventservice.repository.EventRepository;
+import com.college.event_service.model.Event;
+import com.college.event_service.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

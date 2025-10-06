@@ -1,7 +1,7 @@
-package com.eventsystem.eventservice.controller;
+package com.college.event_service.controller;
 
-import com.eventsystem.eventservice.model.Event;
-import com.eventsystem.eventservice.service.EventService;
+import com.college.event_service.model.Event;
+import com.college.event_service.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
