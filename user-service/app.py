@@ -14,7 +14,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # --- Database Setup (MongoDB) ---
-MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017/") # Use default for local Docker
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb://host.docker.internal:27017/") # Use default for local Docker
 client = MongoClient(MONGO_URI)
 db = client.user_db  # The database name for this service
 users_collection = db.users # The collection (table) for users
@@ -73,14 +73,14 @@ def get_user(id):
     return jsonify({"error": "User not found"}), 404
 
 
-userServicPort = 5001
+userServicPort = 5000
 
 eureka_client.init(
-    eureka_server="http://localhost:8761/eureka/",
-    app_name="user-serice",
+    eureka_server="http://service-registry:8761/eureka/",
+    app_name="user-service",
     instance_port=userServicPort,
     instance_ip= socket.gethostbyname(socket.gethostname())
 )
 
 if __name__ == '__main__':
-    app.run(host='localhost', debug=True, port=userServicPort)
+    app.run(host='0.0.0.0', debug=True, port=userServicPort)

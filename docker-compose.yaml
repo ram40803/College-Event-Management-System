@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # 1. Spring Boot Service Registry (Eureka)
+  service-registry:
+    # Points to the Dockerfile in the 'service-registry' folder
+    build:
+      context: ./service-registry 
+      dockerfile: Dockerfile
+    container_name: service-registry-container
+    ports:
+      - "8761:8761" 
+    networks:
+      - microservice-net
+    restart: always
+
+  # 2. spring boot api gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway-container
+    ports:
+      - "8080:8080" 
+    networks:
+      - microservice-net
+    restart: always
+
+  # 3. Spring Boot Event Service
+  event-service:
+    build:
+      context: ./event-service
+      dockerfile: Dockerfile
+    container_name: event-service-container
+    ports:
+      - "8081:8081" 
+    networks:
+      - microservice-net
+    depends_on:
+      - service-registry 
+    environment:
+      # Use the 'dev' profile for configuration specific to the development environment
+      - SPRING_PROFILES_ACTIVE=dev
+
+
+  # 4. Flask User Service
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service-container
+    ports:
+      - "5000:5000" 
+    networks:
+      - microservice-net
+    depends_on:
+      - service-registry 
+    restart: always
+
+networks:
+  microservice-net:
+    driver: bridge

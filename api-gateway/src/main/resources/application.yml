@@ -8,3 +8,8 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://service-registry:8761/eureka/

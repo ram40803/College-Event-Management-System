@@ -2,7 +2,7 @@
 FROM eclipse-temurin:21-jdk-jammy AS build
 
 # Set the working directory inside the container to /myservice
-WORKDIR /api-gateway
+WORKDIR /service-registry
 
 # Copy the Maven wrapper, settings, and pom.xml for dependency caching
 COPY mvnw .
@@ -24,14 +24,14 @@ RUN ./mvnw package -DskipTests
 FROM eclipse-temurin:21-jre-jammy
 
 # Set an environment variable for the JAR file path using the new directory
-ENV APP_HOME /api-gateway
-ENV APP_JAR ${APP_HOME}/api-gateway.jar
+ENV APP_HOME /service-registry
+ENV APP_JAR ${APP_HOME}/service-registry.jar
 
 # Set the working directory for the runtime stage
 WORKDIR ${APP_HOME}
 
 # Copy the built JAR from the 'build' stage into the /myservice directory
-COPY --from=build ${APP_HOME}/target/api-gateway.jar ${APP_JAR}
+COPY --from=build ${APP_HOME}/target/service-registry.jar ${APP_JAR}
 
 # Set the entry point to run the Spring Boot application
 ENTRYPOINT java -jar $APP_JAR

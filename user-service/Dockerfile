@@ -1,9 +1,9 @@
 # user-service/Dockerfile
 # Use an official Python runtime as a parent image
-FROM python:3.11-slim
+FROM python:3.13.7-slim
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /user_service
 
 # Copy the requirements file and install dependencies
 COPY requirements.txt .
