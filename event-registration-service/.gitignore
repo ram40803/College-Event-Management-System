@@ -1,0 +1,16 @@
+/node_modules
+/npm-debug.log*
+/.npm
+/.node_repl_history
+/pids
+/.pid
+/.seed
+/*.log
+/dist
+/build
+.env
+/dts.txt
+/hs_err_pid*
+*~
+*.swp
+.DS_Store
