@@ -73,7 +73,7 @@ def get_user(id):
     return jsonify({"error": "User not found"}), 404
 
 
-userServicPort = 5000
+userServicPort = 8082
 
 eureka_client.init(
     eureka_server="http://service-registry:8761/eureka/",

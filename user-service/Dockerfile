@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose the port the app runs on (Flask default is 5000)
-EXPOSE 5000
+EXPOSE 8082
 
 # Define the command to run the application
 # We use Gunicorn or a similar WSGI server for production, 

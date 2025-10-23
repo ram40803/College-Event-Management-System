@@ -50,7 +50,21 @@ services:
       dockerfile: Dockerfile
     container_name: user-service-container
     ports:
-      - "5000:5000" 
+      - "8082:8082" 
+    networks:
+      - microservice-net
+    depends_on:
+      - service-registry 
+    restart: always
+
+  # 4. Node Event Registration Service
+  event-registration-service:
+    build:
+      context: ./event-registration-service
+      dockerfile: Dockerfile
+    container_name: event-registration-container
+    ports:
+      - "8083:8083" 
     networks:
       - microservice-net
     depends_on:
