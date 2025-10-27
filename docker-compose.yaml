@@ -10,6 +10,11 @@ services:
     container_name: service-registry-container
     ports:
       - "8761:8761" 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
     networks:
       - microservice-net
     restart: always
@@ -24,6 +29,9 @@ services:
       - "8080:8080" 
     networks:
       - microservice-net
+    depends_on:
+      service-registry:
+        condition: service_healthy
     restart: always
 
   # 3. Spring Boot Event Service
@@ -33,11 +41,12 @@ services:
       dockerfile: Dockerfile
     container_name: event-service-container
     ports:
-      - "8081:8081" 
+      - "8081:8081"
     networks:
       - microservice-net
     depends_on:
-      - service-registry 
+      service-registry:
+        condition: service_healthy
     environment:
       # Use the 'dev' profile for configuration specific to the development environment
       - SPRING_PROFILES_ACTIVE=dev
@@ -50,25 +59,30 @@ services:
       dockerfile: Dockerfile
     container_name: user-service-container
     ports:
-      - "8082:8082" 
+      - "8082:8082"
     networks:
       - microservice-net
     depends_on:
-      - service-registry 
+      service-registry:
+        condition: service_healthy
     restart: always
 
-  # 4. Node Event Registration Service
+  # 5. Node Event Registration Service
   event-registration-service:
     build:
       context: ./event-registration-service
       dockerfile: Dockerfile
     container_name: event-registration-container
     ports:
-      - "8083:8083" 
+      - "8083:8083"
+    environment:
+      - EUREKA_HOST=service-registry
+      - EUREKA_PORT=8761
     networks:
       - microservice-net
     depends_on:
-      - service-registry 
+      service-registry:
+        condition: service_healthy
     restart: always
 
 networks:
