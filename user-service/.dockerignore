@@ -1,0 +1,30 @@
+# Python specific
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# IDE/Editor specific
+.idea/
+.vscode/
+*.swp
+*.bak
+*~
+
+# Git
+.git/
+.gitignore
+
+# Docker specific
+Dockerfile
+.dockerignore
+
+# Database files (if applicable)
+*.sqlite3
+*.db
+
+# Environment variables
+.env
