@@ -1,36 +1,26 @@
-// app.js - Main entry point for the Express API server
-const express = require('express');
-// Ensure database connection starts when the server starts
-require('./db/mysql_pool'); 
-const eventRoutes = require('./routes/event.routes');
+const express = require("express");
+const dotenv = require("dotenv");
+const sequelize = require("./config/db.js");
+const registrationRoutes = require("./routes/registrationRoutes.js");
+require("./utils/eurekaClient.js");
+
+dotenv.config();
 
 const app = express();
-const port = 3000;
+app.use(express.json());
 
-// --- Middleware Setup ---
-app.use(express.json()); // Body Parser for JSON requests
+// Routes
+app.use("/api/registrations", registrationRoutes);
 
-// Simple request logger
-app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-    next();
+// Sync database
+sequelize
+  .sync({ alter: true })
+  .then(() => console.log("✅ MySQL connected and tables synced"))
+  .catch((err) => console.error("❌ DB connection failed:", err));
+
+app.get("/", (req, res) => {
+  res.send("🎉 Registration Service is running!");
 });
 
-// --- API Routes ---
-app.use('/api/events', eventRoutes);
-
-// Basic health check route
-app.get('/', (req, res) => {
-    res.send('College Event Management API is running.');
-});
-
-// Global error handler (handles errors passed via next(err))
-app.use((err, req, res, next) => {
-    console.error('GLOBAL ERROR:', err.stack);
-    res.status(500).json({ message: 'Something broke on the server.', error: err.message });
-});
-
-// Start the server
-app.listen(port, () => {
-    console.log(`Server listening at http://localhost:${port}`);
-});
+const PORT = process.env.PORT || 4002;
+app.listen(PORT, () => console.log(`🚀 Registration Service on port ${PORT}`));
