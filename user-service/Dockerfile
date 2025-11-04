@@ -18,4 +18,4 @@ EXPOSE 8082
 # Define the command to run the application
 # We use Gunicorn or a similar WSGI server for production, 
 # but for development, we can start with flask run:
-CMD ["python", "app.py"]
+CMD ["python", "run.py"]

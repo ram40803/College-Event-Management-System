@@ -79,12 +79,33 @@ const getRegistrationsByUser = async (req, res) => {
 
 // Delete a registration
 const deleteRegistration = async (req, res) => {
+  const { id } = req.params;
+
   try {
-    const { id } = req.params;
+    // 1️⃣ Find the registration
+    const registration = await Registration.findByPk(id);
+    if (!registration) {
+      return res.status(404).json({ message: "Registration not found" });
+    }
+
+    const { eventId } = registration;
+
+    // 2️⃣ Try to get event (optional if microservices separated)
+    const event = await getEventById(eventId);
+
+    // 3️⃣ Delete registration
     await Registration.destroy({ where: { id } });
-    res.json({ message: "Registration deleted successfully" });
+
+    // 4️⃣ Only update event count if it exists
+    if (event && event.currentParticipants > 0) {
+      event.currentParticipants = event.currentParticipants - 1;
+      await updateEvent(event);
+    }
+
+    res.status(200).json({ message: "Registration deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Error deleting registration:", error.message);
+    res.status(500).json({ message: "Error deleting registration" });
   }
 };
 
