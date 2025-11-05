@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 from datetime import datetime, timezone
 import bcrypt
 import jwt
+import re
 
 from utils.otp_utils import generate_otp_with_expiry, is_otp_expired
 from utils.email_sender import send_otp_email
@@ -11,6 +12,11 @@ auth_bp = Blueprint("auth_bp", __name__)
 # Helpers to access db
 def users_collection():
     return current_app.mongo.users
+
+# Helpers to valided emil
+def is_valid_email(email):
+    regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+    return re.match(regex, email)
 
 # ---------------- REGISTER ----------------
 @auth_bp.route("/register", methods=["POST"])
@@ -22,6 +28,9 @@ def register_user():
 
     if not (email and name and password):
         return jsonify({"error": "name, email and password are required"}), 400
+    
+    if not is_valid_email(email):
+        return jsonify({"error": "Invalid email format"}), 400
 
     # check existing user
     existing = users_collection().find_one({"email": email})
