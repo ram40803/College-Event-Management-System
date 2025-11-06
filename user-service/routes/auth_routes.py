@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from datetime import datetime, timezone
+from bson import ObjectId
 import bcrypt
 import jwt
 import re
@@ -157,3 +158,21 @@ def login():
         "token": token,
         "user": {"name": user.get("name"), "email": user.get("email")}
     }), 200
+
+# ------------------ Find User -------------------
+@auth_bp.route('/<user_id>', methods=['GET'])
+def get_user_by_id(user_id):
+    """
+    Get user details by MongoDB ObjectId.
+    """
+    try:
+        user = users_collection().find_one({"_id": ObjectId(user_id)}, {"password": 0, "otp": 0, "otp_expiry": 0})
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Convert ObjectId to string for JSON
+        user["_id"] = str(user["_id"])
+        return jsonify(user), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Invalid user ID: {str(e)}"}), 400
