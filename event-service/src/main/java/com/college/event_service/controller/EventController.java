@@ -37,14 +37,16 @@ public class EventController {
             return ResponseEntity.ok().build();
         }
         catch (Exception e){
-            return ResponseEntity.internalServerError().build();
+           return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id){
-        eventService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        if(eventService.deleteById(id))
+            return ResponseEntity.noContent().build();
+        else
+            return ResponseEntity.internalServerError().build();
     }
 }
 

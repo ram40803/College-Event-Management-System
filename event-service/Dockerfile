@@ -45,3 +45,4 @@ EXPOSE ${SERVER_PORT}
 
 # Set the entry point using the shell form to ensure $APP_JAR is expanded correctly
 ENTRYPOINT java -jar $APP_JAR
+
