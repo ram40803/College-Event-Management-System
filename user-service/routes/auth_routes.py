@@ -6,7 +6,7 @@ import jwt
 import re
 
 from utils.otp_utils import generate_otp_with_expiry, is_otp_expired
-from utils.email_sender import send_otp_email
+from utils.kafka_producer import send_otp_email
 
 auth_bp = Blueprint("auth_bp", __name__)
 
