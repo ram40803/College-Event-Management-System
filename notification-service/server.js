@@ -1,11 +1,17 @@
-import dotenv from "dotenv";
-import app from "./app.js";
-import logger from "./config/logger.js";
+const express = require('express');
+const { runConsumer } = require('./kafka/consumer');
+require("./utils/eurekaClient.js");
 
-dotenv.config();
+const app = express();
+const PORT = 8084;
 
-const PORT = process.env.PORT || 5003;
+app.get('/', (req, res) => {
+  res.send('📬 Notification Service with Kafka is running!');
+});
+
+// Start Kafka consumer
+runConsumer().catch(console.error);
 
 app.listen(PORT, () => {
-  logger.info(`🚀 Notification Service running on port ${PORT}`);
+  console.log(`🚀 Notification Service running on port ${PORT}`);
 });
