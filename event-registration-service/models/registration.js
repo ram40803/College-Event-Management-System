@@ -8,7 +8,7 @@ const Registration = sequelize.define("Registration", {
     autoIncrement: true,
   },
   userId: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   eventId: {

@@ -13,6 +13,11 @@ const registerUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    //Check if user varify
+    if(!user.is_verified){
+      return res.status(403).json({ message: "User not varify"})
+    }
+
     //Check if event exists
     const event = await getEventById(eventId);
     if (!event) {
@@ -20,7 +25,7 @@ const registerUser = async (req, res) => {
     }
 
     //Check event status
-    if (!event.isOpen) {
+    if (event.status.toLowerCase() !== 'open') {
       return res.status(400).json({ message: "Event registration is closed" });
     }
 
@@ -82,7 +87,7 @@ const deleteRegistration = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // 1️⃣ Find the registration
+    // Find the registration
     const registration = await Registration.findByPk(id);
     if (!registration) {
       return res.status(404).json({ message: "Registration not found" });
@@ -90,13 +95,13 @@ const deleteRegistration = async (req, res) => {
 
     const { eventId } = registration;
 
-    // 2️⃣ Try to get event (optional if microservices separated)
+    // Try to get event (optional if microservices separated)
     const event = await getEventById(eventId);
 
-    // 3️⃣ Delete registration
+    // Delete registration
     await Registration.destroy({ where: { id } });
 
-    // 4️⃣ Only update event count if it exists
+    // Only update event count if it exists
     if (event && event.currentParticipants > 0) {
       event.currentParticipants = event.currentParticipants - 1;
       await updateEvent(event);
@@ -109,4 +114,28 @@ const deleteRegistration = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, getAllRegistrations, getRegistrationsByUser, deleteRegistration }
+// Delete all registrations for a specific event
+const deleteRegistrationsByEventId = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    // Check if eventId provided
+    if (!eventId) {
+      return res.status(400).json({ message: 'Event ID is required' });
+    }
+
+    // Delete all registrations associated with this event
+    const deletedCount = await Registration.destroy({
+      where: { eventId: eventId },
+    });
+
+    res.status(200).json({
+      message: `All ${deletedCount} registrations deleted successfully for event ${eventId}`,
+    });
+  } catch (error) {
+    console.error('Error deleting registrations:', error);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+};
+
+module.exports = { registerUser, getAllRegistrations, getRegistrationsByUser, deleteRegistration, deleteRegistrationsByEventId }

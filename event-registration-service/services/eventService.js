@@ -3,14 +3,9 @@ const { getServiceUrl } = require('./serviceLocator');
 
 async function getEventById(eventId) {
   const baseUrl = getServiceUrl('EVENT-SERVICE');
-  const response = await httpClient.get(`${baseUrl}/events/${eventId}`);
-  return response.data;
-}
-
-async function getAllEvents(){
-  const baseUrl = getServiceUrl('EVENT-SERVICE');
+  
   try{
-    const response = await httpClient.get(`${baseUrl}/events`);
+    const response = await httpClient.get(`${baseUrl}/events/${eventId}`);
     return response.data;
   }
   catch(error){

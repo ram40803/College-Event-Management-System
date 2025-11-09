@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 
 // Routes
-app.use("/api/registrations", registrationRoutes);
+app.use("/registrations", registrationRoutes);
 
 // Sync database
 sequelize

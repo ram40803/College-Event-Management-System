@@ -3,8 +3,14 @@ const { getServiceUrl } = require('./serviceLocator');
 
 async function getUserById(userId) {
   const baseUrl = getServiceUrl('USER-SERVICE');
-  const response = await httpClient.get(`${baseUrl}/users/${userId}`);
-  return response.data;
+  
+  try{
+    const response = await httpClient.get(`${baseUrl}/users/${userId}`);
+    return response.data;
+  }
+  catch(error){
+    console.log(`service::eventService::getAllEvents: ${error}`);
+  }
 }
 
 module.exports = { getUserById };
