@@ -3,20 +3,26 @@ const { getServiceUrl } = require('./serviceLocator');
 
 async function getEventById(eventId) {
   const baseUrl = getServiceUrl('EVENT-SERVICE');
-  const response = await httpClient.get(`${baseUrl}/events/${eventId}`);
-  return response.data;
-}
-
-async function getAllEvents(){
-  const baseUrl = getServiceUrl('EVENT-SERVICE');
+  
   try{
-    const response = await httpClient.get(`${baseUrl}/events`);
+    const response = await httpClient.get(`${baseUrl}/events/${eventId}`);
     return response.data;
   }
   catch(error){
-    console.log(`service::eventService::getAllEvents: ${error}`)
+    console.log(`service::eventService::getAllEvents: ${error}`);
   }
-  
 }
 
-module.exports = { getEventById, getAllEvents };
+async function updateEvent(updatedEvent){
+  const baseUrl = getServiceUrl('EVENT-SERVICE');
+  try{
+    await httpClient.put(`${baseUrl}/events/${updatedEvent.id}`, updatedEvent);
+    return true;
+  }
+  catch(error){
+    console.log(`service::eventService::updateEvent: ${error}`);
+    return false;
+  }
+}
+
+module.exports = { getEventById, getAllEvents, updateEvent};

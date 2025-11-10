@@ -21,6 +21,9 @@ public class Event {
 
     private String name;
     private String description;
+    private String status;
+    private int maxParticipantsCapacity;
+    private int currentParticipants;
     private LocalDateTime date;
     private String location;
     private String organizer;

@@ -30,10 +30,23 @@ public class EventController {
         return eventService.getEventById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateEvent(@PathVariable Long id, @RequestBody Event updatedEvent){
+        try {
+            eventService.updateEvent(id, updatedEvent);
+            return ResponseEntity.ok().build();
+        }
+        catch (Exception e){
+           return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id){
-        eventService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        if(eventService.deleteById(id))
+            return ResponseEntity.noContent().build();
+        else
+            return ResponseEntity.internalServerError().build();
     }
 }
 
