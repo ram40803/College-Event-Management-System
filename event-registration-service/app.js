@@ -3,9 +3,10 @@ const express = require('express');
 // Ensure database connection starts when the server starts
 require('./db/mysql_pool'); 
 const eventRoutes = require('./routes/event.routes');
+require('./utils/eurekaClient');
 
 const app = express();
-const port = 3000;
+const port = 8083;
 
 // --- Middleware Setup ---
 app.use(express.json()); // Body Parser for JSON requests

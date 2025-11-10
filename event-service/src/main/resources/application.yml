@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:mysql://host.docker.internal:3306/eventdb
     username: root
-    password: Ram@2208
+    password: qrdjxn@19$
     driver-class-name: com.mysql.cj.jdbc.Driver
     jpa:
       hibernate:
