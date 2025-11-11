@@ -96,6 +96,8 @@ services:
       - DB_NAME=registrationdb
       - EUREKA_HOST=service-registry
       - EUREKA_PORT=8761
+      - KAFKA_BROKER=kafka:9092
+      - KAFKA_TOPIC=notifications
     networks:
       - microservice-net
     depends_on:

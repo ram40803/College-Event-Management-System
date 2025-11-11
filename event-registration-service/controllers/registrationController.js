@@ -1,6 +1,7 @@
 const Registration = require("../models/registration.js");
 const { getUserById } = require("../services/userService.js");
 const { getEventById, updateEvent } = require("../services/eventService.js");
+const { sendRegistrationSuccess } = require("../services/notificationService.js")
 
 // Register a user for an event
 const registerUser = async (req, res) => {
@@ -49,6 +50,7 @@ const registerUser = async (req, res) => {
     // Only if update successful, then create registration
     const registration = await Registration.create({ userId, eventId });
 
+    sendRegistrationSuccess(user, event);
     res.status(201).json({
       message: "Registration successful",
       registration

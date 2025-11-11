@@ -25,4 +25,4 @@ async function updateEvent(updatedEvent){
   }
 }
 
-module.exports = { getEventById, getAllEvents, updateEvent};
+module.exports = { getEventById, updateEvent};
