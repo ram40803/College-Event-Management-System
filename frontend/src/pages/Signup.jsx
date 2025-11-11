@@ -1,44 +1,75 @@
-import { Link } from "react-router-dom";
+// src/pages/Signup.jsx
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../utils/api";
 
 export default function Signup() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    try {
+      await api.post("/user-service/users/register", {
+        email,
+        password,
+        role: "user",
+      });
+      alert("Registered successfully! Please verify OTP.");
+      navigate("/verify-otp");
+    } catch (err) {
+      console.error(err);
+      alert("Signup failed. Try again.");
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] bg-gray-50 px-4">
-      <div className="bg-white shadow-md rounded-2xl p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">
-          Create an Account
-        </h2>
+    <div className="flex justify-center items-center min-h-screen bg-[#f0f7ff]">
+      <form
+        onSubmit={handleSignup}
+        className="bg-white p-8 shadow-lg rounded-xl w-96"
+      >
+        <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
 
-        <form className="flex flex-col gap-4">
-          <input
-            type="email"
-            placeholder="Email"
-            className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="text"
-            placeholder="Enter OTP"
-            className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition"
-          >
-            Sign Up
-          </button>
-        </form>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+          className="border w-full p-2 mb-4 rounded-md"
+          required
+        />
 
-        <p className="text-sm text-center mt-4 text-gray-600">
-          Already have an account?{" "}
-          <Link to="/login" className="text-blue-600 font-medium hover:underline">
-            Login
-          </Link>
-        </p>
-      </div>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          className="border w-full p-2 mb-4 rounded-md"
+          required
+        />
+
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Confirm Password"
+          className="border w-full p-2 mb-4 rounded-md"
+          required
+        />
+
+        <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
+          Sign Up
+        </button>
+      </form>
     </div>
   );
 }

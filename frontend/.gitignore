@@ -1,24 +1,62 @@
+# Node.js dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Vite cache
+.vite/
+
 # Logs
-logs
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Local environment files
+.env
+.env.local
+.env.*.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
+# Editor and IDE files
+.vscode/
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Optional: coverage reports
+coverage/
+*.lcov
+
+# Temporary files
+*.tmp
+*.temp
+
+# eslint / prettier cache
+.eslintcache
+.prettiercache
+
+# Optional: test snapshots
+__snapshots__/
+
+# Lock files (if you only use one package manager)
+# Uncomment one line if you want to enforce a single lockfile
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Optional: mock data or backup JSONs
+mock_data.json
+db.json
+
+# Optional: local assets or uploads not needed in repo
+/public/uploads/
