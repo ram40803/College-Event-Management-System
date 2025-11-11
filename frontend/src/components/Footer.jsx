@@ -1,7 +1,16 @@
-export default function Footer() {
+import React from "react";
+
+const Footer = () => {
   return (
-    <footer className="bg-blue-700 text-white text-center py-6 mt-10">
-      <p className="text-sm">&copy; 2025 CEMS. All rights reserved.</p>
+    <footer className="bg-gray-100 py-6 text-center text-gray-600 mt-10">
+      <p>
+        © {new Date().getFullYear()} CampusEvent. All rights reserved.
+      </p>
+      <p className="text-sm mt-2">
+        Designed for college communities to simplify event management.
+      </p>
     </footer>
   );
-}
+};
+
+export default Footer;

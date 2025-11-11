@@ -1,16 +1,21 @@
 export default function Hero() {
   return (
     <section
-      id="home"
-      className="h-[80vh] flex flex-col justify-center items-center text-center bg-linear-to-br from-blue-600 to-indigo-700 text-white"
+      className="flex flex-col items-center justify-center text-center py-24"
+      style={{ backgroundColor: "#f0f7ff" }}
     >
-      <h1 className="text-5xl font-bold mb-4">Welcome to CEMS</h1>
-      <p className="text-lg max-w-xl mb-6">
-        Manage, Organize, and Explore College Events with Ease.
+      <h1 className="text-4xl md:text-5xl font-bold text-blue-700 mb-4">
+        Welcome to College Event Management System
+      </h1>
+      <p className="max-w-2xl text-slate-600 text-lg mb-6">
+        Discover, register, and participate in your campus events effortlessly.
       </p>
-      <button className="bg-white text-blue-700 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-100 transition">
+      <a
+        href="#events"
+        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+      >
         Explore Events
-      </button>
+      </a>
     </section>
   );
 }

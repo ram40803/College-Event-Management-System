@@ -1,39 +1,36 @@
-import { Link } from "react-router-dom";
+// src/pages/Login.jsx
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../utils/api";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await api.post("/user-service/users/login", { email, password });
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("userId", data.userId);
+      navigate(data.role === "admin" ? "/admin/dashboard" : "/user/dashboard");
+    } catch (err) {
+      alert("Login failed. Check your credentials.");
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] bg-gray-50 px-4">
-      <div className="bg-white shadow-md rounded-2xl p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">
-          Login to Your Account
-        </h2>
-
-        <form className="flex flex-col gap-4">
-          <input
-            type="email"
-            placeholder="Email"
-            className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition"
-          >
-            Login
-          </button>
-        </form>
-
-        <p className="text-sm text-center mt-4 text-gray-600">
-          Don’t have an account?{" "}
-          <Link to="/signup" className="text-blue-600 font-medium hover:underline">
-            Sign Up
-          </Link>
-        </p>
-      </div>
+    <div className="flex justify-center items-center min-h-screen bg-[#f0f7ff]">
+      <form onSubmit={handleLogin} className="bg-white p-8 shadow-lg rounded-xl w-96">
+        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email" className="border w-full p-2 mb-4 rounded-md" required />
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password" className="border w-full p-2 mb-4 rounded-md" required />
+        <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">Login</button>
+      </form>
     </div>
   );
 }
