@@ -36,7 +36,7 @@ const Home = () => {
           unforgettable experiences with our all-in-one platform designed for
           college communities.
         </p>
-
+{/* 
         <div className="flex flex-col sm:flex-row gap-4 mt-10">
           <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition">
             Start Free Trial →
@@ -44,17 +44,17 @@ const Home = () => {
           <button className="bg-white border border-gray-300 px-8 py-3 rounded-xl font-semibold hover:bg-gray-50 transition">
             Watch Demo
           </button>
-        </div>
+        </div> */}
 
         <div className="flex flex-col sm:flex-row justify-center items-center gap-6 mt-10 text-gray-600 text-sm">
           <div className="flex items-center gap-2">
-            ✅ <span>No credit card required</span>
+            ✅ <span>Community Building</span>
           </div>
           <div className="flex items-center gap-2">
-            ✅ <span>Free for 30 days</span>
+            ✅ <span>Exposure</span>
           </div>
           <div className="flex items-center gap-2">
-            ✅ <span>Cancel anytime</span>
+            ✅ <span>Adventure</span>
           </div>
         </div>
       </section>
