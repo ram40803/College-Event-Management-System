@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -11,10 +12,12 @@ export default function Signup() {
   });
   const [loading, setLoading] = useState(false);
 
+  // Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -25,30 +28,40 @@ export default function Signup() {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/user-service/users/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const response = await axios.post(
+        "http://localhost:8080/user-service/users/register",
+        {
           name: formData.name,
           email: formData.email,
           password: formData.password,
-        }),
-      });
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      if (response.ok) {
-        const data = await response.json();
-        alert(data.message || "Signup successful!");
-        localStorage.setItem("signupEmail", formData.email); // Store email for OTP verification
-        navigate("/verify-otp");
-      } else {
-        const err = await response.json();
-        alert(err.message || "Signup failed. Please try again.");
-      }
+      // Expecting: { message: "Registered successfully ,Otp sent to email" }
+      alert(response.data.message || "Signup successful!");
+      localStorage.setItem("signupEmail", formData.email);
+      navigate("/verify-otp");
     } catch (error) {
-      console.error("Error:", error);
-      alert("Something went wrong. Please try again.");
+      console.error("Signup Error:", error);
+
+      if (error.response) {
+        // Server responded with a status other than 2xx
+        alert(
+          error.response.data?.message ||
+            `Signup failed with status ${error.response.status}`
+        );
+      } else if (error.request) {
+        // No response from server
+        alert("No response from server. Please check your backend.");
+      } else {
+        // Other errors
+        alert("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
