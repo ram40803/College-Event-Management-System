@@ -1,178 +1,135 @@
-// src/pages/Signup.jsx
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState("form");
-  const [countdown, setCountdown] = useState(0);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [loading, setLoading] = useState(false);
 
-  const baseUrl = "/user-service/users";
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isLogin) {
-      // LOGIN
-      try {
-        const res = await axios.post(`${baseUrl}/login`, { email, password });
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("role", res.data.role || "user");
-        navigate("/");
-      } catch (err) {
-        alert("Login failed: " + (err.response?.data?.message || err.message));
-      }
-    } else {
-      // SIGNUP
-      if (password !== confirmPassword) return alert("Passwords do not match!");
-      try {
-        await axios.post(`${baseUrl}/register`, { email, password });
-        setStep("verify");
-      } catch (err) {
-        alert("Signup failed: " + (err.response?.data?.message || err.message));
-      }
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
     }
-  };
 
-  const handleResendOtp = async () => {
+    setLoading(true);
     try {
-      await axios.post(`${baseUrl}/resend-otp`, { email });
-      setCountdown(300);
-      const timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } catch (err) {
-      alert("Failed to resend OTP");
-    }
-  };
+      const response = await fetch("http://localhost:8080/user-service/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
-  const handleVerifyOtp = async () => {
-    try {
-      await axios.post(`${baseUrl}/verify-otp`, { email, otp });
-      alert("Account verified! You can now login.");
-      setIsLogin(true);
-      setStep("form");
-    } catch (err) {
-      alert("OTP verification failed");
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message || "Signup successful!");
+        localStorage.setItem("signupEmail", formData.email); // Store email for OTP verification
+        navigate("/verify-otp");
+      } else {
+        const err = await response.json();
+        alert(err.message || "Signup failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-[#f0f7ff] px-4">
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-6 text-blue-600">
-          {isLogin ? "Login" : step === "verify" ? "Verify OTP" : "Signup"}
+    <div className="flex items-center justify-center min-h-screen bg-[#f0f7ff]">
+      <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">
+          Create Your Account
         </h2>
-
-        {step === "verify" ? (
-          <>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Name</label>
             <input
               type="text"
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="w-full p-2 border rounded mb-4"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="w-full mt-1 p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              placeholder="Enter your full name"
             />
-            <button
-              onClick={handleVerifyOtp}
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-            >
-              Verify OTP
-            </button>
-            <div className="flex justify-between items-center mt-4 text-sm">
-              <button
-                onClick={handleResendOtp}
-                disabled={countdown > 0}
-                className={`${
-                  countdown > 0 ? "text-gray-400" : "text-blue-600 hover:underline"
-                }`}
-              >
-                {countdown > 0
-                  ? `Resend OTP in ${Math.floor(countdown / 60)}:${String(
-                      countdown % 60
-                    ).padStart(2, "0")}`
-                  : "Resend OTP"}
-              </button>
-            </div>
-          </>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col">
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Email Address</label>
             <input
               type="email"
-              placeholder="Email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border rounded mb-4"
+              className="w-full mt-1 p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              placeholder="you@example.com"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Password</label>
             <input
               type="password"
-              placeholder="Password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border rounded mb-4"
+              className="w-full mt-1 p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              placeholder="Enter password"
             />
-            {!isLogin && (
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full p-2 border rounded mb-4"
-              />
-            )}
+          </div>
 
-            <button
-              type="submit"
-              className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-            >
-              {isLogin ? "Login" : "Signup"}
-            </button>
-          </form>
-        )}
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Confirm Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              className="w-full mt-1 p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              placeholder="Confirm password"
+            />
+          </div>
 
-        <p className="text-center text-sm mt-4">
-          {isLogin ? (
-            <>
-              Don’t have an account?{" "}
-              <button
-                onClick={() => {
-                  setIsLogin(false);
-                  setStep("form");
-                }}
-                className="text-blue-600 hover:underline"
-              >
-                Signup here
-              </button>
-            </>
-          ) : (
-            <>
-              Already have an account?{" "}
-              <button
-                onClick={() => {
-                  setIsLogin(true);
-                  setStep("form");
-                }}
-                className="text-blue-600 hover:underline"
-              >
-                Login here
-              </button>
-            </>
-          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+          >
+            {loading ? "Signing up..." : "Sign Up"}
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-slate-600 mt-4">
+          Already have an account?{" "}
+          <span
+            className="text-blue-600 font-medium cursor-pointer hover:underline"
+            onClick={() => navigate("/login")}
+          >
+            Login
+          </span>
         </p>
       </div>
     </div>
