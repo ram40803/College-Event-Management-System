@@ -27,11 +27,11 @@ def send_notification_event(email, subject, message):
 
 def send_otp_email(email, otp, name=None):
     otp_data = {
-        email,
-        "Your OTP Verification Code",
-        f"Hello{(' ' + name) if name else ''},\n\nYour OTP code is: {otp}\nIt will expire in a few minutes.\n\nIf you didn't request this, ignore this email."
+        "email": email,
+        "subject": "Your OTP Verification Code",
+        "message": f"Hello{(' ' + name) if name else ''},\n\nYour OTP code is: {otp}\nIt will expire in a few minutes.\n\nIf you didn't request this, ignore this email."
     }
-    producer.send(KAFKA_BROKER, otp_data)
+    producer.send(KAFKA_TOPIC, otp_data)
     producer.flush()
     print(f"📤 Send otp to kafka: {otp_data}")
     
