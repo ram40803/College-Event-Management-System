@@ -166,6 +166,16 @@ services:
         condition: service_started
     restart: always
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-container
+    ports:
+      - "5173:80"
+    networks:
+      - microservice-net
+
 networks:
   microservice-net:
     driver: bridge

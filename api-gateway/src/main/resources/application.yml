@@ -9,6 +9,18 @@ spring:
           enabled: true
           lower-case-service-id: true
 
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders: "*"
+            allowCredentials: true
+
 eureka:
   client:
     serviceUrl:
