@@ -19,16 +19,18 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/user-service': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        secure: false,
-      },
+      // '/user-service': {
+      //   target: 'http://localhost:8080',
+      //   changeOrigin: true,
+      //   secure: false,
+      // },
       '/event-service': {
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       },
+      '/event-registration-service': 'http://localhost:8080',
+      
     },
   },
 })
