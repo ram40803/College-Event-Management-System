@@ -68,6 +68,5 @@ Have a great time!
 module.exports = {
   sendRegistrationSuccess,
   sendRegistrationCancelled,
-  sendEventReminder,
-  sendEventUpdate,
+  sendEventReminder
 };
