@@ -1,7 +1,6 @@
 import os
 from flask import Flask
 from flask_pymongo import PyMongo
-from flask_cors import CORS
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,7 +24,6 @@ class Config:
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
 
     app.config["MONGO_URI"] = Config.MONGO_URI
     app.config["SECRET_KEY"] = Config.SECRET_KEY
