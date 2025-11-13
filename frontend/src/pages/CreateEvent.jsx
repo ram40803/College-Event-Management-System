@@ -21,7 +21,7 @@ export default function CreateEvent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/event-service/events/", form);
+      await api.post("/event-service/events", form);
       alert("Event created successfully");
       navigate("/admin/dashboard");
     } catch {
