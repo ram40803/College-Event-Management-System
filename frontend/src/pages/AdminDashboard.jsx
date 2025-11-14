@@ -9,7 +9,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     api
-      .get("/event-service/events/")
+      .get("/event-service/events")
       .then((res) => setEvents(res.data))
       .catch(() => alert("Failed to load events"));
   }, []);

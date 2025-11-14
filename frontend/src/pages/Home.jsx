@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import EventCard from "../components/EventCard";
-import axios from "axios";
+import api from "../utils/api";
 
 const Home = () => {
   const [events, setEvents] = useState([]);
@@ -12,16 +12,8 @@ const Home = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/event-service/events", {
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (Array.isArray(response.data)) {
-        setEvents(response.data);
-      } else {
-        console.error("Unexpected API format:", response.data);
-        setEvents([]);
-      }
+      const response = await api.get("/event-service/events");
+      setEvents(response.data);
     } catch (error) {
       console.error("Error fetching events:", error);
     } finally {
