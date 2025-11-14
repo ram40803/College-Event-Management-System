@@ -58,6 +58,7 @@ def register_user():
         "name": name,
         "email": email,
         "password": hashed,
+        "role": "student",
         "is_verified": False,
         "otp": otp_data["otp"],
         "otp_expiry": otp_data["expiry_time"],
