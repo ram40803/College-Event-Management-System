@@ -4,6 +4,7 @@ import axios from "axios";
 
 const Home = () => {
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchEvents();
@@ -11,10 +12,20 @@ const Home = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/event-service/events/");
-      setEvents(response.data);
+      const response = await axios.get("http://localhost:8080/event-service/events", {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (Array.isArray(response.data)) {
+        setEvents(response.data);
+      } else {
+        console.error("Unexpected API format:", response.data);
+        setEvents([]);
+      }
     } catch (error) {
       console.error("Error fetching events:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,15 +47,6 @@ const Home = () => {
           unforgettable experiences with our all-in-one platform designed for
           college communities.
         </p>
-{/* 
-        <div className="flex flex-col sm:flex-row gap-4 mt-10">
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition">
-            Start Free Trial →
-          </button>
-          <button className="bg-white border border-gray-300 px-8 py-3 rounded-xl font-semibold hover:bg-gray-50 transition">
-            Watch Demo
-          </button>
-        </div> */}
 
         <div className="flex flex-col sm:flex-row justify-center items-center gap-6 mt-10 text-gray-600 text-sm">
           <div className="flex items-center gap-2">
@@ -65,7 +67,9 @@ const Home = () => {
           Upcoming Events
         </h2>
 
-        {events.length > 0 ? (
+        {loading ? (
+          <p className="text-center text-gray-600">Loading events...</p>
+        ) : events.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.map((event) => (
               <EventCard key={event.id} event={event} />

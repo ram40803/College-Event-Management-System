@@ -3,35 +3,39 @@ import React from "react";
 const EventCard = ({ event }) => {
   const {
     id,
-    title,
+    name,
     description,
     date,
     location,
-    capacity,
-    registered,
     status,
-    image,
-    category,
+    maxParticipantsCapacity,
+    currentParticipants,
+    organizer,
   } = event;
 
-  const percentage = Math.min(Math.round((registered / capacity) * 100), 100);
+  // Compute participant percentage
+  const percentage = Math.min(
+    Math.round((currentParticipants / maxParticipantsCapacity) * 100),
+    100
+  );
 
+  // Status colors based on backend 'status' value
   const statusColors = {
-    Ongoing: "bg-green-100 text-green-700",
-    Upcoming: "bg-yellow-100 text-yellow-700",
+    Open: "bg-green-100 text-green-700",
+    Ongoing: "bg-yellow-100 text-yellow-700",
     Completed: "bg-gray-200 text-gray-700",
     Cancelled: "bg-red-100 text-red-700",
   };
 
   return (
     <div className="bg-white rounded-2xl shadow-md overflow-hidden transition hover:shadow-lg">
+      {/* Image placeholder (optional if backend adds image later) */}
       <div className="relative">
-        <img src={image} alt={title} className="w-full h-48 object-cover" />
-
-        {/* Category Tag */}
-        <span className="absolute bottom-2 left-2 bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded-full">
-          {category}
-        </span>
+        <img
+          src={`https://source.unsplash.com/600x400/?conference,event,${name}`}
+          alt={name}
+          className="w-full h-48 object-cover"
+        />
 
         {/* Status Badge */}
         <span
@@ -44,8 +48,10 @@ const EventCard = ({ event }) => {
       </div>
 
       <div className="p-5">
-        <h3 className="text-lg font-bold text-gray-800 mb-1">{title}</h3>
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">{description}</p>
+        <h3 className="text-lg font-bold text-gray-800 mb-1">{name}</h3>
+        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+          {description}
+        </p>
 
         <div className="text-sm text-gray-500 space-y-1 mb-3">
           <div className="flex items-center gap-2">
@@ -56,11 +62,16 @@ const EventCard = ({ event }) => {
             <span>📍</span>
             <span>{location}</span>
           </div>
+          <div className="flex items-center gap-2">
+            <span>👤</span>
+            <span>Organizer: {organizer}</span>
+          </div>
         </div>
 
+        {/* Participants Progress Bar */}
         <div className="flex justify-between text-xs text-gray-500 mb-1">
           <span>
-            👥 {registered} / {capacity}
+            👥 {currentParticipants} / {maxParticipantsCapacity}
           </span>
           <span>{percentage}%</span>
         </div>
@@ -81,4 +92,3 @@ const EventCard = ({ event }) => {
 };
 
 export default EventCard;
-
