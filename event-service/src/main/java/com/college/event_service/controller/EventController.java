@@ -3,6 +3,7 @@ package com.college.event_service.controller;
 import com.college.event_service.model.Event;
 import com.college.event_service.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +22,8 @@ public class EventController {
     }
 
     @GetMapping
-    public List<Event> getAllEvents(){
-        return eventService.getAllEvents();
+    public Page<Event> getAllEvents(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
+        return eventService.getAllEvents(page, size);
     }
 
     @GetMapping("/{id}")
@@ -47,6 +48,19 @@ public class EventController {
             return ResponseEntity.noContent().build();
         else
             return ResponseEntity.internalServerError().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Event>> searchEvents(
+            @RequestParam("keyword") String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<Event> events = eventService.searchEvents(keyword, page, size);
+        if (events.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(events);
     }
 }
 

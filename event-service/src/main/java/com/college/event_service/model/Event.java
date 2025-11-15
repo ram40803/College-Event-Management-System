@@ -1,9 +1,6 @@
 package com.college.event_service.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,16 +12,29 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Event {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(length = 2000)
     private String description;
-    private String status;
-    private int maxParticipantsCapacity;
-    private int currentParticipants;
-    private LocalDateTime date;
+
+    private Integer maxParticipantsCapacity;
+
+    private Integer currentParticipants = 0;
+
+    @Column(nullable = false)
+    private LocalDateTime startDate;
+
+    @Column(nullable = false)
+    private LocalDateTime endDate;
+
     private String location;
+
     private String organizer;
 }
+
