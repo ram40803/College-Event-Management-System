@@ -1,0 +1,49 @@
+[33m0859d45[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m solved home page conflict
+[33mfcc6b1e[m modification in ui of singup and login
+[33mf66a9bc[m add role in user data
+[33m2a9d5ba[m fix all api url
+[33m5e7ce4f[m remove cors form user service
+[33md17134f[m create cors filter in api gateway
+[33me8681c1[m correct error in kafka producer file
+[33mb5bb767[m Merge branch 'main' of https://github.com/ram40803/College-Event-Management-System
+[33m6006fe8[m change fetch request to axios
+[33m6f54406[m marege frondend change in project
+[33m5d5744c[m remove eventUpdateSend from event registration service
+[33md16b8c5[m change signup page
+[33m82c369f[m add docker file for forntend
+[33m0191cb8[m create docker file for frontend and frontend service in docker compose
+[33m0f3c0a5[m marge frontend with changes.
+[33mfee1f26[m changes in signup and navbar
+[33m95cfca9[m marge frontend work in github
+[33m19417a6[m Merge branch 'main' of https://github.com/ram40803/College-Event-Management-System
+[33m3f02de2[m create kafka producer to send message to notification service and create notification message for opration like success fully register for event
+[33m0884f8e[m Merge branch 'main' of https://github.com/ram40803/College-Event-Management-System
+[33m04ca39d[m front end  setup
+[33mbccc2ee[m create registration service connection in event server for api call
+[33mef947c1[m integrate kafka producer in user service
+[33md6b0406[m add configration of notification service, kafka and zookeeper in docker compose file
+[33m72b374d[m create kafka consumer and notification logic also create eureka client for register in eureka in notification service
+[33m5acf9da[m fix error in event registration service
+[33m6c64757[m add user find by id
+[33mca91d8d[m configer eureka client to register in eureka server and add function for check email format before user register
+[33m7280b6c[m change user service and create new api and also add otp functionality in user service
+[33m04c686b[m change event registration seervice
+[33m3d7aa9b[m create update function in event service
+[33meaa81be[m create notification service
+[33mae7db6d[m add .dockerignore file in all service
+[33mce65576[m create health for service registry check in docker compose
+[33m7686664[m create new utils for connection with eurekaClient and services. and connect with event service
+[33m62f01ef[m create docker file for event registration service and change port of user service
+[33m82476b1[m created event registration service
+[33m1f86b5c[m create docker file for event service, user service, api gateway and service registry and create docker compose file to connect all this with each other linked that with same network
+[33m80c0d27[m change eventservice to event-service
+[33mba95e90[m create api-gateway and register that into eureka server
+[33m7e9fae1[m register user and event service into service registry
+[33m87e4668[m create eureka server
+[33mdd7458f[m created user service
+[33m1ad3605[m solved error in event service
+[33m4254559[m create EventController(api's for events) calss
+[33m6d3491f[m creating EventService class
+[33medeecce[m creating EventRepository class
+[33mede9181[m creating event service
+[33m6971b44[m Initial commit
