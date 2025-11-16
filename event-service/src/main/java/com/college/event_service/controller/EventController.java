@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/events")
@@ -19,6 +21,19 @@ public class EventController {
     @PostMapping
     public void createEvent(@RequestBody Event event){
         eventService.createEvent(event);
+    }
+
+    @PostMapping("/{eventId}/upload-image")
+    public ResponseEntity<?> uploadEventImage(
+            @PathVariable Long eventId,
+            @RequestParam("file") MultipartFile file
+    ) {
+        try {
+            String imageUrl = eventService.uploadEventImage(file, eventId);
+            return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Upload failed: " + e.getMessage());
+        }
     }
 
     @GetMapping

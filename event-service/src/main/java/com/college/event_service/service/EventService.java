@@ -1,26 +1,35 @@
 package com.college.event_service.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.college.event_service.model.Event;
 import com.college.event_service.repository.EventRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class EventService {
 
     @Autowired
-    private EventRepository eventRepo;
+    private final EventRepository eventRepo;
 
     @Autowired
-    private RegistrationService registrationService;
+    private final RegistrationService registrationService;
+
+    private final Cloudinary cloudinary;
 
     public String getStatus(Event event) {
         LocalDateTime now = LocalDateTime.now();
@@ -37,6 +46,28 @@ public class EventService {
     public Event createEvent(Event event){
         return eventRepo.save(event);
     }
+
+    public String uploadEventImage(MultipartFile file, Long eventId) throws IOException {
+
+        // 1. Upload image to Cloudinary
+        Map uploadResult = cloudinary.uploader().upload(
+                file.getBytes(),
+                ObjectUtils.asMap("folder", "event_images")
+        );
+
+        String imageUrl = uploadResult.get("secure_url").toString();
+
+        // 2. Update event with image URL
+        Event event = eventRepo.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with ID: " + eventId));
+
+        event.setImageUrl(imageUrl);
+        eventRepo.save(event);
+
+        // 3. Return uploaded image URL
+        return imageUrl;
+    }
+
 
     public Page<Event> getAllEvents(int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
