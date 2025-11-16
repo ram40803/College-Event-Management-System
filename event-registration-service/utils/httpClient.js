@@ -1,7 +1,15 @@
 const axios = require('axios');
+const axiosRetry = require("axios-retry").default;
 
 const httpClient = axios.create({
   timeout: 5000,
+});
+
+// Retry failed requests automatically
+axiosRetry(httpClient, {
+  retries: 3,
+  retryDelay: axiosRetry.exponentialDelay,
+  retryCondition: (err) => axiosRetry.isNetworkError(err) || axiosRetry.isRetryableError(err),
 });
 
 httpClient.interceptors.request.use(request => {
