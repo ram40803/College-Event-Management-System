@@ -6,14 +6,23 @@ const Home = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
+  // pagination states
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchEvents = async () => {
+  useEffect(() => {
+    fetchEvents(page);
+  }, [page]);
+
+  const fetchEvents = async (pageNum) => {
     try {
-      const response = await api.get("/event-service/events");
-      setEvents(response.data);
+      setLoading(true);
+
+      const response = await api.get(`/event-service/events?page=${pageNum}&size=10`);
+
+      setEvents(response.data.content);
+      setTotalPages(response.data.totalPages);
+
     } catch (error) {
       console.error("Error fetching events:", error);
     } finally {
@@ -21,36 +30,27 @@ const Home = () => {
     }
   };
 
+  const handlePrev = () => {
+    if (page > 0) setPage(page - 1);
+  };
+
+  const handleNext = () => {
+    if (page < totalPages - 1) setPage(page + 1);
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-50">
-      {/* 🌟 HERO SECTION */}
-      <section className="w-full flex flex-col items-center justify-center text-center py-24 bg-linear-to-b from-blue-50 to-white px-6">
-        <div className="bg-blue-100 text-blue-700 font-medium px-4 py-2 rounded-full mb-6">
-          🌟 Transform Campus Events
-        </div>
 
+      {/* 🌟 HERO SECTION */}
+      <section className="w-full flex flex-col items-center justify-center text-center py-24 bg-gradient-to-b from-blue-50 to-white px-6">
         <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight">
           Organize Campus Events <br />
           <span className="text-blue-600">Like Never Before</span>
         </h1>
 
         <p className="text-gray-600 mt-6 text-lg md:text-xl max-w-3xl">
-          Streamline event planning, boost student engagement, and create
-          unforgettable experiences with our all-in-one platform designed for
-          college communities.
+          Discover amazing events and participate with your friends!
         </p>
-
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-6 mt-10 text-gray-600 text-sm">
-          <div className="flex items-center gap-2">
-            ✅ <span>Community Building</span>
-          </div>
-          <div className="flex items-center gap-2">
-            ✅ <span>Exposure</span>
-          </div>
-          <div className="flex items-center gap-2">
-            ✅ <span>Adventure</span>
-          </div>
-        </div>
       </section>
 
       {/* 🎉 EVENTS SECTION */}
@@ -62,11 +62,45 @@ const Home = () => {
         {loading ? (
           <p className="text-center text-gray-600">Loading events...</p>
         ) : events.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
+          <>
+            {/* Event cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {events.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+
+            {/* Pagination Buttons */}
+            <div className="flex justify-center items-center gap-4 mt-10">
+              <button
+                onClick={handlePrev}
+                disabled={page === 0}
+                className={`px-6 py-2 rounded-lg border ${
+                  page === 0
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : "bg-white hover:bg-gray-100"
+                }`}
+              >
+                Previous
+              </button>
+
+              <span className="text-gray-700 font-medium">
+                Page {page + 1} of {totalPages}
+              </span>
+
+              <button
+                onClick={handleNext}
+                disabled={page === totalPages - 1}
+                className={`px-6 py-2 rounded-lg border ${
+                  page === totalPages - 1
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : "bg-white hover:bg-gray-100"
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          </>
         ) : (
           <p className="text-center text-gray-600">No events available yet.</p>
         )}
