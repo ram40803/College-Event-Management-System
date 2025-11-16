@@ -15,28 +15,27 @@ export default function App() {
   return (
     <>
       <Navbar />
+
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
 
-        {/* User Routes */}
-        <Route
-          path="/user/dashboard"
-          element={<ProtectedRoute element={<UserDashboard />} role="user" />}
-        />
+        {/* Admin Protected Routes */}
+        <Route element={<ProtectedRoute role="admin" />}>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/create-event" element={<CreateEvent />} />
+        </Route>
 
-        {/* Admin Routes */}
-        <Route
-          path="/admin/dashboard"
-          element={<ProtectedRoute element={<AdminDashboard />} role="admin" />}
-        />
-        <Route
-          path="/admin/create-event"
-          element={<ProtectedRoute element={<CreateEvent />} role="admin" />}
-        />
+        {/* Student Protected Routes */}
+        <Route element={<ProtectedRoute role="student" />}>
+          <Route path="/user/dashboard" element={<UserDashboard />} />
+        </Route>
+
       </Routes>
+
       <Footer />
     </>
   );
