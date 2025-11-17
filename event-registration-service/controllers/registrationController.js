@@ -26,9 +26,9 @@ const registerUser = async (req, res) => {
     }
 
     //Check event status
-    if (event.status.toLowerCase() !== 'open') {
-      return res.status(400).json({ message: "Event registration is closed" });
-    }
+    // if (event.status.toLowerCase() !== 'open') {
+    //   return res.status(400).json({ message: "Event registration is closed" });
+    // }
 
     //Check if event is full
     if (event.currentParticipants >= event.maxParticipants) {

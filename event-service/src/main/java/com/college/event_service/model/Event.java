@@ -20,6 +20,8 @@ public class Event {
     @Column(nullable = false)
     private String name;
 
+    private String imageUrl;
+
     @Column(length = 2000)
     private String description;
 
