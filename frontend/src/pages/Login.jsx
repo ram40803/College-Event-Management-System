@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import api from "../utils/api"; // ✅ Make sure this exists (Axios instance)
 
 export default function Login() {
   const navigate = useNavigate();
@@ -12,38 +13,37 @@ export default function Login() {
     e.preventDefault();
     setErrorMsg("");
 
-    // 🔥 HARDCODED ADMIN CREDENTIALS
-    const ADMIN_EMAIL = "ffghxi@gmail.com";
-    const ADMIN_PASSWORD = "ffghxi";
+    try {
+      const res = await api.post("/user-service/users/login", {
+        email,
+        password,
+      });
 
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      const user = {
-        _id: "6916ad5abe1764b990ceebee",
-        email: ADMIN_EMAIL,
-        name: "ffghxi",
-        role: "admin",
-        is_verified: true,
-      };
+      const { token, user } = res.data;
 
-      // Save token + user
-      localStorage.setItem("token", "hardcoded-admin-token");
+      // Save Login Data
+      localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("role", "admin");   // ⭐ Needed for ProfileIcon color + ProtectedRoute
+      localStorage.setItem("role", user.role);
+      localStorage.setItem("userId", user.id);
 
-      // 🔥 Notify navbar + ProtectedRoute
+      // Notify navbar & protected routes
       window.dispatchEvent(new Event("authChange"));
 
-      navigate("/admin/dashboard");
-      return;
+      // Redirect by role
+      if (user.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/user/dashboard");
+      }
+    } catch (err) {
+      setErrorMsg("Invalid email or password.");
     }
-
-    setErrorMsg("Invalid email or password.");
   };
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-[#f0f7ff] px-4">
       <div className="bg-white shadow-xl rounded-2xl p-10 w-full max-w-md">
-
         <h1 className="text-3xl font-bold text-center text-blue-700 mb-8">
           Welcome Back
         </h1>
@@ -55,7 +55,9 @@ export default function Login() {
         )}
 
         <form onSubmit={handleLogin}>
-          <label className="block font-medium mb-1 text-gray-700">Email Address</label>
+          <label className="block font-medium mb-1 text-gray-700">
+            Email Address
+          </label>
           <input
             type="email"
             placeholder="you@example.com"
@@ -65,7 +67,9 @@ export default function Login() {
             className="w-full p-3 rounded-lg border border-gray-300 mb-4 focus:ring-2 focus:ring-blue-400 outline-none"
           />
 
-          <label className="block font-medium mb-1 text-gray-700">Password</label>
+          <label className="block font-medium mb-1 text-gray-700">
+            Password
+          </label>
           <input
             type="password"
             placeholder="Enter password"
@@ -84,7 +88,10 @@ export default function Login() {
 
           <p className="text-center mt-4 text-gray-700">
             Don’t have an account?{" "}
-            <Link to="/signup" className="text-blue-700 font-semibold hover:underline">
+            <Link
+              to="/signup"
+              className="text-blue-700 font-semibold hover:underline"
+            >
               Sign Up
             </Link>
           </p>
