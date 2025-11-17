@@ -14,7 +14,7 @@ export default function Login() {
 
     // 🔥 HARDCODED ADMIN CREDENTIALS
     const ADMIN_EMAIL = "ffghxi@gmail.com";
-    const ADMIN_PASSWORD = "admin123";
+    const ADMIN_PASSWORD = "ffghxi";
 
     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
       const user = {
