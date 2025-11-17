@@ -157,7 +157,12 @@ def login():
     return jsonify({
         "message": "Login successful",
         "token": token,
-        "user": {"id": str(user.get("_id")), "name": user.get("name"), "email": user.get("email")}
+        "user": {
+            "id": str(user.get("_id")), 
+            "name": user.get("name"), 
+            "email": user.get("email"), 
+            "role": user.get("role")
+        }
     }), 200
 
 # ------------------ Find User -------------------
