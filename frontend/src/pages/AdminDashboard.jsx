@@ -1,6 +1,15 @@
-// src/pages/AdminDashboard.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import FeatureCard from "../components/FeatureCard";
+
+import {
+  HiCalendar,
+  HiUsers,
+  HiSpeakerphone,
+  HiCheckCircle,
+  HiChartBar,
+  HiUserGroup,
+} from "react-icons/hi";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -18,66 +27,68 @@ export default function AdminDashboard() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#f0f7ff] p-6">
-      {/* Top Welcome Header */}
+    <div className="min-h-screen bg-[#f0f7ff] px-6 py-10">
       <div className="mb-10">
         <h1 className="text-4xl font-bold text-blue-900">Admin Dashboard</h1>
-        <p className="text-gray-700 mt-2">Welcome, {user.name}</p>
+        <p className="text-gray-600 text-lg mt-2">Welcome, {user.name}</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-        {/* Users Card */}
-        <div className="backdrop-blur-xl bg-white/40 shadow-lg p-6 rounded-2xl border border-white/50">
-          <h2 className="text-xl font-semibold text-blue-800">Total Users</h2>
-          <p className="text-4xl font-bold mt-2 text-blue-900">42</p>
-        </div>
-
-        {/* Events Card */}
-        <div className="backdrop-blur-xl bg-white/40 shadow-lg p-6 rounded-2xl border border-white/50">
-          <h2 className="text-xl font-semibold text-blue-800">Total Events</h2>
-          <p className="text-4xl font-bold mt-2 text-blue-900">18</p>
-        </div>
-
-        {/* Admins Card */}
-        <div className="backdrop-blur-xl bg-white/40 shadow-lg p-6 rounded-2xl border border-white/50">
-          <h2 className="text-xl font-semibold text-blue-800">Admins</h2>
-          <p className="text-4xl font-bold mt-2 text-blue-900">3</p>
-        </div>
-      </div>
-
-      {/* Management Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Feature Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        {/* Manage Users */}
-        <div className="backdrop-blur-xl bg-white/40 shadow-lg p-8 rounded-2xl border border-white/50">
-          <h2 className="text-2xl font-semibold text-blue-800 mb-4">
-            User Management
-          </h2>
-          <p className="text-gray-700 mb-6">Add, remove, and manage registered users.</p>
+        <FeatureCard
+          icon={HiCalendar}
+          title="Event Scheduling"
+          description="Create and manage events easily."
+          bgColor="#eaf4ff"
+          iconBg="#2563eb"
+          onClick={() => navigate("/admin/create-event")}
+        />
 
-          <button
-            onClick={() => navigate("/admin/users")}
-            className="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition font-medium"
-          >
-            Manage Users
-          </button>
-        </div>
+        <FeatureCard
+          icon={HiUsers}
+          title="Registration System"
+          description="Manage participant registrations."
+          bgColor="#e9fff5"
+          iconBg="#059669"
+          onClick={() => navigate("/admin/registrations")}
+        />
 
-        {/* Manage Events */}
-        <div className="backdrop-blur-xl bg-white/40 shadow-lg p-8 rounded-2xl border border-white/50">
-          <h2 className="text-2xl font-semibold text-blue-800 mb-4">
-            Event Management
-          </h2>
-          <p className="text-gray-700 mb-6">Create, modify, or delete campus events.</p>
+        <FeatureCard
+          icon={HiSpeakerphone}
+          title="Promotion Tools"
+          description="Send announcements and promote events."
+          bgColor="#fff3dd"
+          iconBg="#ea580c"
+          onClick={() => navigate("/admin/promotion-tools")}
+        />
 
-          <button
-            onClick={() => navigate("/admin/events")}
-            className="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition font-medium"
-          >
-            Manage Events
-          </button>
-        </div>
+        <FeatureCard
+          icon={HiCheckCircle}
+          title="Check-In System"
+          description="QR code check-in tracking."
+          bgColor="#f3e7ff"
+          iconBg="#7e22ce"
+          onClick={() => navigate("/admin/checkin")}
+        />
+
+        <FeatureCard
+          icon={HiChartBar}
+          title="Analytics Dashboard"
+          description="Track event performance."
+          bgColor="#ffe3ea"
+          iconBg="#db2777"
+          onClick={() => navigate("/admin/analytics")}
+        />
+
+        <FeatureCard
+          icon={HiUserGroup}
+          title="Team Collaboration"
+          description="Manage roles and communicate."
+          bgColor="#eef2ff"
+          iconBg="#1f2937"
+          onClick={() => navigate("/admin/team")}
+        />
 
       </div>
     </div>

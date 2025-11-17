@@ -10,6 +10,11 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CreateEvent from "./pages/CreateEvent";
 import UserDashboard from "./pages/UserDashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import AdminRegistrations from "./pages/AdminRegistrations";
+import AdminPromotionTools from "./pages/AdminPromotionTools";
+import AdminCheckIn from "./pages/AdminCheckIn";
+import AdminAnalytics from "./pages/AdminAnalytics";
+import AdminTeam from "./pages/AdminTeam";
 
 export default function App() {
   return (
@@ -24,10 +29,16 @@ export default function App() {
         <Route path="/verify-otp" element={<VerifyOtp />} />
 
         {/* Admin Protected Routes */}
-        <Route element={<ProtectedRoute role="admin" />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/create-event" element={<CreateEvent />} />
-        </Route>
+      <Route element={<ProtectedRoute role="admin" />}>
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/create-event" element={<CreateEvent />} />
+        <Route path="/admin/registrations" element={<AdminRegistrations />} />
+        <Route path="/admin/promotion-tools" element={<AdminPromotionTools />} />
+        <Route path="/admin/checkin" element={<AdminCheckIn />} />
+        <Route path="/admin/analytics" element={<AdminAnalytics />} />
+        <Route path="/admin/team" element={<AdminTeam />} />
+      </Route>
+
 
         {/* Student Protected Routes */}
         <Route element={<ProtectedRoute role="student" />}>
