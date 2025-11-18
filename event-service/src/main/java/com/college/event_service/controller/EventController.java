@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,15 +20,20 @@ public class EventController {
     private EventService eventService;
 
     @PostMapping
-    public void createEvent(@RequestBody Event event){
-        eventService.createEvent(event);
+    public ResponseEntity<Map<String, Object>> createEvent(@RequestBody Event event) {
+        Event savedEvent = eventService.createEvent(event);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Event created successfully");
+        response.put("id", savedEvent.getId());
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{eventId}/upload-image")
     public ResponseEntity<?> uploadEventImage(
             @PathVariable Long eventId,
-            @RequestParam("file") MultipartFile file
-    ) {
+            @RequestParam("file") MultipartFile file) {
         try {
             String imageUrl = eventService.uploadEventImage(file, eventId);
             return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
@@ -37,29 +43,29 @@ public class EventController {
     }
 
     @GetMapping
-    public Page<Event> getAllEvents(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
+    public Page<Event> getAllEvents(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         return eventService.getAllEvents(page, size);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getEventById(@PathVariable Long id){
+    public ResponseEntity<Event> getEventById(@PathVariable Long id) {
         return eventService.getEventById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateEvent(@PathVariable Long id, @RequestBody Event updatedEvent){
+    public ResponseEntity<Void> updateEvent(@PathVariable Long id, @RequestBody Event updatedEvent) {
         try {
             eventService.updateEvent(id, updatedEvent);
             return ResponseEntity.ok().build();
-        }
-        catch (Exception e){
-           return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable Long id){
-        if(eventService.deleteById(id))
+    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
+        if (eventService.deleteById(id))
             return ResponseEntity.noContent().build();
         else
             return ResponseEntity.internalServerError().build();
@@ -69,8 +75,7 @@ public class EventController {
     public ResponseEntity<Page<Event>> searchEvents(
             @RequestParam("keyword") String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         Page<Event> events = eventService.searchEvents(keyword, page, size);
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -78,4 +83,3 @@ public class EventController {
         return ResponseEntity.ok(events);
     }
 }
-
