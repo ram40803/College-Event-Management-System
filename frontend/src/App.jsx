@@ -15,6 +15,7 @@ import AdminPromotionTools from "./pages/AdminPromotionTools";
 import AdminCheckIn from "./pages/AdminCheckIn";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import AdminTeam from "./pages/AdminTeam";
+import EventDetails from "./pages/EventDetails";
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/event-details/:id" element={<EventDetails />} />
 
         {/* Admin Protected Routes */}
       <Route element={<ProtectedRoute role="admin" />}>

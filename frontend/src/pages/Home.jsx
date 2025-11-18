@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import EventCard from "../components/EventCard";
 import api from "../utils/api";
+import EventSection from "../components/EventSection";
 
 const Home = () => {
   const [events, setEvents] = useState([]);
@@ -53,58 +54,7 @@ const Home = () => {
         </p>
       </section>
 
-      {/* 🎉 EVENTS SECTION */}
-      <section className="w-full max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-gray-800 text-center mb-10">
-          Upcoming Events
-        </h2>
-
-        {loading ? (
-          <p className="text-center text-gray-600">Loading events...</p>
-        ) : events.length > 0 ? (
-          <>
-            {/* Event cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {events.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
-
-            {/* Pagination Buttons */}
-            <div className="flex justify-center items-center gap-4 mt-10">
-              <button
-                onClick={handlePrev}
-                disabled={page === 0}
-                className={`px-6 py-2 rounded-lg border ${
-                  page === 0
-                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                    : "bg-white hover:bg-gray-100"
-                }`}
-              >
-                Previous
-              </button>
-
-              <span className="text-gray-700 font-medium">
-                Page {page + 1} of {totalPages}
-              </span>
-
-              <button
-                onClick={handleNext}
-                disabled={page === totalPages - 1}
-                className={`px-6 py-2 rounded-lg border ${
-                  page === totalPages - 1
-                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                    : "bg-white hover:bg-gray-100"
-                }`}
-              >
-                Next
-              </button>
-            </div>
-          </>
-        ) : (
-          <p className="text-center text-gray-600">No events available yet.</p>
-        )}
-      </section>
+      <EventSection />
     </div>
   );
 };

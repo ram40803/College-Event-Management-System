@@ -1,240 +1,225 @@
 import React, { useState } from "react";
 import api from "../utils/api";
 
-const CreateEvent = () => {
-  const [form, setForm] = useState({
+const EventCreate = () => {
+  const [formData, setFormData] = useState({
     name: "",
     description: "",
+    maxParticipantsCapacity: "",
     startDate: "",
     endDate: "",
+    startRegistrationDate: "",
+    endRegistrationDate: "",
     location: "",
     organizer: "",
-    maxParticipantsCapacity: "",
   });
 
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-
-  const [loading, setLoading] = useState(false);
-
+  const [image, setImage] = useState(null);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState(""); // "success" | "error"
 
-
-  // Handle text inputs
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle image upload preview
-  const handleImage = (e) => {
-    const file = e.target.files[0];
-    setImageFile(file);
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-    }
-  };
-
-  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
-      // 1️⃣ Create event without image first
-      const eventRes = await api.post("/event-service/events", form);
+      // 1️⃣ Create event without image
+      const eventResponse = await api.post("/event-service/events", formData);
+      const eventId = eventResponse.data.id;
 
-      const eventId = eventRes.data.id;
-
-      // 2️⃣ If image selected → upload image and update event
-      if (imageFile) {
-        const formData = new FormData();
-        formData.append("file", imageFile);
+      // 2️⃣ Upload image, if selected
+      if (image) {
+        const formDataImg = new FormData();
+        formDataImg.append("file", image);
 
         await api.post(
           `/event-service/events/${eventId}/upload-image`,
-          formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          formDataImg,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
         );
       }
 
-      setMessage("Event created successfully!");
-      setMessageType("success");
-
-      setForm({
+      setMessage("🎉 Event created successfully!");
+      setFormData({
         name: "",
         description: "",
+        maxParticipantsCapacity: "",
         startDate: "",
         endDate: "",
+        startRegistrationDate: "",
+        endRegistrationDate: "",
         location: "",
         organizer: "",
-        maxParticipantsCapacity: "",
       });
-
-      setImageFile(null);
-      setImagePreview(null);
+      setImage(null);
 
     } catch (error) {
-      console.error(error);
-      setMessage("Error creating event. Try again.");
-      setMessageType("error");
-
+      setMessage("❌ Failed to create event.");
+      console.error("Create event error:", error);
     }
-
-    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-20 px-6">
+    <div className="min-h-screen flex justify-center items-start bg-gray-50 py-14 px-6">
+      <div className="w-full max-w-3xl bg-white p-10 rounded-2xl shadow-xl">
 
-      {/* PAGE TITLE */}
-      <h1 className="text-4xl font-bold text-gray-800 mb-10">
-        Create New Event
-      </h1>
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-8">
+          Create New Event
+        </h1>
 
-      <div className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-3xl">
-
-        {/* FORM */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-
-          {/* IMAGE UPLOAD */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Event Poster
-            </label>
-
-            <div className="flex items-center gap-4">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImage}
-                className="block w-full text-sm text-gray-600"
-              />
-            </div>
-
-            {/* IMAGE PREVIEW */}
-            {imagePreview && (
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="mt-4 w-full h-60 object-cover rounded-xl shadow"
-              />
-            )}
+        {message && (
+          <div className="mb-5 text-center py-3 bg-blue-100 text-blue-700 rounded-lg font-medium">
+            {message}
           </div>
+        )}
 
-          {/* EVENT NAME */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          
+          {/* NAME */}
           <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Event Name
-            </label>
+            <label className="font-medium text-gray-700">Event Name</label>
             <input
               type="text"
               name="name"
-              value={form.name}
-              onChange={handleChange}
               required
-              className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg mt-1"
+            />
+          </div>
+
+          {/* IMAGE */}
+          <div>
+            <label className="font-medium text-gray-700">Event Image</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImage(e.target.files[0])}
+              className="w-full mt-1"
             />
           </div>
 
           {/* DESCRIPTION */}
           <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Description
-            </label>
+            <label className="font-medium text-gray-700">Description</label>
             <textarea
               name="description"
-              value={form.description}
-              onChange={handleChange}
               rows="4"
-              className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+              required
+              value={formData.description}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg mt-1"
             ></textarea>
           </div>
 
-          {/* DATE ROW */}
+          {/* DATE FIELDS */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Start Date & Time
-              </label>
+              <label className="font-medium text-gray-700">Start Date</label>
               <input
                 type="datetime-local"
                 name="startDate"
-                value={form.startDate}
-                onChange={handleChange}
                 required
-                className="w-full border rounded-lg px-4 py-2"
+                value={formData.startDate}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg mt-1"
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                End Date & Time
-              </label>
+              <label className="font-medium text-gray-700">End Date</label>
               <input
                 type="datetime-local"
                 name="endDate"
-                value={form.endDate}
-                onChange={handleChange}
                 required
-                className="w-full border rounded-lg px-4 py-2"
+                value={formData.endDate}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg mt-1"
               />
             </div>
           </div>
 
-          {/* LOCATION + ORGANIZER */}
+          {/* REGISTRATION DATES */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Location
+              <label className="font-medium text-gray-700">
+                Registration Start Date
               </label>
               <input
-                type="text"
-                name="location"
-                value={form.location}
-                onChange={handleChange}
+                type="datetime-local"
+                name="startRegistrationDate"
                 required
-                className="w-full border rounded-lg px-4 py-2"
+                value={formData.startRegistrationDate}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg mt-1"
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Organizer
+              <label className="font-medium text-gray-700">
+                Registration End Date
               </label>
               <input
-                type="text"
-                name="organizer"
-                value={form.organizer}
-                onChange={handleChange}
+                type="datetime-local"
+                name="endRegistrationDate"
                 required
-                className="w-full border rounded-lg px-4 py-2"
+                value={formData.endRegistrationDate}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg mt-1"
               />
             </div>
           </div>
 
           {/* CAPACITY */}
           <div>
-            <label className="block text-gray-700 font-medium mb-2">
+            <label className="font-medium text-gray-700">
               Max Participants
             </label>
             <input
               type="number"
               name="maxParticipantsCapacity"
-              value={form.maxParticipantsCapacity}
-              onChange={handleChange}
               required
-              className="w-full border rounded-lg px-4 py-2"
+              value={formData.maxParticipantsCapacity}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg mt-1"
             />
           </div>
 
-          {/* SUBMIT BUTTON */}
+          {/* LOCATION */}
+          <div>
+            <label className="font-medium text-gray-700">Location</label>
+            <input
+              type="text"
+              name="location"
+              required
+              value={formData.location}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg mt-1"
+            />
+          </div>
+
+          {/* ORGANIZER */}
+          <div>
+            <label className="font-medium text-gray-700">Organizer</label>
+            <input
+              type="text"
+              name="organizer"
+              required
+              value={formData.organizer}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg mt-1"
+            />
+          </div>
+
           <button
             type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-blue-600 text-white text-lg font-medium rounded-lg hover:bg-blue-700 transition"
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg rounded-xl"
           >
-            {loading ? "Creating..." : "Create Event"}
+            Create Event
           </button>
         </form>
       </div>
@@ -242,4 +227,4 @@ const CreateEvent = () => {
   );
 };
 
-export default CreateEvent;
+export default EventCreate;
