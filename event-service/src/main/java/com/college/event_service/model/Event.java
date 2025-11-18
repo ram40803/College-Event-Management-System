@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Event {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,6 +33,12 @@ public class Event {
 
     @Column(nullable = false)
     private LocalDateTime endDate;
+
+    @Column(nullable = false)
+    private LocalDateTime startRegistrationDate;
+
+    @Column(nullable = false)
+    private LocalDateTime endRegistrationDate;
 
     private String location;
 
