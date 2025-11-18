@@ -18,7 +18,7 @@ const Home = () => {
     try {
       setLoading(true);
 
-      const response = await api.get(`/event-service/events?page=${pageNum}&size=10`);
+      const response = await api.get(`/event-service/events?page=${pageNum}&size=9`);
 
       setEvents(response.data.content);
       setTotalPages(response.data.totalPages);
