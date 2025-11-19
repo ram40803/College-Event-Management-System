@@ -151,29 +151,8 @@ const EventSection = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.map((event) => (
               <div key={event.id} className="relative">
-
                 {/* Event Card */}
                 <EventCard event={event} />
-
-                {/* Admin Buttons */}
-                {isAdmin && (
-                  <div className="absolute top-2 left-2 flex gap-2">
-                    <button
-                      onClick={() => navigate(`/edit-event/${event.id}`)}
-                      className="px-3 py-1 bg-yellow-500 text-white rounded-md text-xs"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => handleDeleteEvent(event.id)}
-                      className="px-3 py-1 bg-red-600 text-white rounded-md text-xs"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-
               </div>
             ))}
           </div>

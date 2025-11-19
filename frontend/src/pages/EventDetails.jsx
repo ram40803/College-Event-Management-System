@@ -1,150 +1,213 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import MessageBanner from "../components/MessageBanner.jsx";
 
-const EventDetails = () => {
+const EventDetailsPage = () => {
   const { id } = useParams();
-  const [event, setEvent] = useState(null);
+  const navigate = useNavigate();
+
+  const [event, setEvent] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("success");
+
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [registrationId, setRegistrationId] = useState(null);
+
+  const role = localStorage.getItem("role");
+  const userId = localStorage.getItem("userId");
+
   useEffect(() => {
-    fetchEvent();
+    fetchEventDetails();
+    checkRegistrationStatus();
   }, []);
 
-  const fetchEvent = async () => {
+  const fetchEventDetails = async () => {
     try {
       const response = await api.get(`/event-service/events/${id}`);
       setEvent(response.data);
     } catch (error) {
-      console.error("Error fetching event details:", error);
+      console.error("Error loading event:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "UPCOMING":
-        return "bg-blue-100 text-blue-700";
-      case "ONGOING":
-        return "bg-green-100 text-green-700";
-      case "COMPLETED":
-        return "bg-gray-300 text-gray-700";
-      default:
-        return "bg-gray-200 text-gray-600";
+  const checkRegistrationStatus = async () => {
+    try {
+      const response = await api.get(
+        `/event-registration-service/registrations/check`,
+        { params: { eventId: id, userId } }
+      );
+
+      if (response.data.exists) {
+        setIsRegistered(true);
+        setRegistrationId(response.data.record.id);
+      }
+    } catch (error) {
+      console.error("Error checking registration status:", error);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="w-full flex justify-center items-center py-20">
-        <p className="text-gray-600 text-xl">Loading event details...</p>
-      </div>
-    );
-  }
+  const handleRegister = async () => {
+    try {
+      const res = await api.post(`/event-registration-service/registrations`, {
+        eventId: id,
+        userId,
+      });
 
-  if (!event) {
-    return (
-      <div className="w-full flex justify-center items-center py-20">
-        <p className="text-red-500 text-xl">Event not found.</p>
-      </div>
-    );
-  }
+      setMessageType("success");
+      setMessage("Registered successfully!");
+      setIsRegistered(true);
+      setRegistrationId(res.data.registration.id);
+    } catch (error) {
+      setMessageType("error");
+      setMessage(error.response?.data?.message || "Registration failed.");
+    }
+  };
+
+  const handleCancelRegistration = async () => {
+    try {
+      await api.delete(
+        `/event-registration-service/registrations/${registrationId}`
+      );
+
+      setMessageType("success");
+      setMessage("Registration cancelled.");
+      setIsRegistered(false);
+    } catch (error) {
+      setMessageType("error");
+      setMessage("Cancel registration failed.");
+    }
+  };
+
+  const handleDeleteEvent = async () => {
+    if (!window.confirm("Are you sure you want to delete this event?")) return;
+
+    try {
+      await api.delete(`/event-service/events/${id}`);
+
+      setMessageType("success");
+      setMessage("Event deleted successfully!");
+
+      setTimeout(() => navigate("/"), 1200);
+    } catch (error) {
+      setMessageType("error");
+      setMessage("Failed to delete event.");
+    }
+  };
+
+  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (!event) return <p className="text-center mt-10">Event not found.</p>;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center px-6 pt-10 pb-20">
+    <div className="max-w-5xl mx-auto py-12 px-6">
 
-      <div className="w-full max-w-4xl bg-white shadow-xl rounded-2xl overflow-hidden">
+      {message && (
+        <MessageBanner
+          type={messageType}
+          message={message}
+          onClose={() => {
+            setMessage("");
+            setMessageType("");
+          }}
+        />
+      )}
+      <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+        {/* Event Banner */}
+        <img
+          src={event.imageUrl}
+          alt={event.name}
+          className="w-full h-80 object-cover"
+        />
 
-        {/* EVENT IMAGE */}
-        <div className="w-full h-80 bg-gray-200">
-          <img
-            src={event.imageUrl || "/placeholder.jpg"}
-            alt={event.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        <div className="p-6">
 
-        {/* CONTENT */}
-        <div className="p-10">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            {event.name}
+          </h1>
 
-          {/* TITLE + STATUS */}
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-extrabold text-gray-900">
-              {event.name}
-            </h1>
-
-            <span
-              className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
-                event.status
-              )}`}
-            >
-              {event.status}
-            </span>
-          </div>
-
-          {/* DESCRIPTION */}
-          <p className="text-gray-700 text-lg leading-relaxed mb-8">
+          <p className="text-gray-700 text-lg mb-5">
             {event.description}
           </p>
 
-          {/* DETAILS GRID */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+          {/* Dates */}
+          <div className="space-y-2 text-gray-700">
+            <p>📅 <b>Start:</b> {new Date(event.startDate).toLocaleString()}</p>
+            <p>📅 <b>End:</b> {new Date(event.endDate).toLocaleString()}</p>
 
-            <div className="space-y-3">
-              <h2 className="font-bold text-gray-800 text-xl">Event Details</h2>
-              <p className="text-gray-600">
-                <strong>Date:</strong> <br />
-                {event.startDate.replace("T", " ")} <br />→ <br />
-                {event.endDate.replace("T", " ")}
-              </p>
+            <p>📝 <b>Registration Start:</b> {new Date(event.startRegistrationDate).toLocaleString()}</p>
+            <p>📝 <b>Registration End:</b> {new Date(event.endRegistrationDate).toLocaleString()}</p>
 
-              <p className="text-gray-600">
-                <strong>Location:</strong> {event.location}
-              </p>
+            <p>📍 <b>Location:</b> {event.location}</p>
+            <p>👤 <b>Organizer:</b> {event.organizer}</p>
+          </div>
 
-              <p className="text-gray-600">
-                <strong>Organizer:</strong> {event.organizer}
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <h2 className="font-bold text-gray-800 text-xl">Participants</h2>
-
-              <p className="text-gray-600">
-                <strong>Capacity:</strong>{" "}
-                {event.currentParticipants} / {event.maxParticipantsCapacity}
-              </p>
-
-              {/* PROGRESS BAR */}
-              <div className="w-full bg-gray-200 rounded-full h-4">
-                <div
-                  className="bg-blue-600 h-4 rounded-full"
-                  style={{
-                    width: `${
-                      (event.currentParticipants /
-                        event.maxParticipantsCapacity) *
-                      100
-                    }%`,
-                  }}
-                ></div>
-              </div>
+          {/* Participants */}
+          <div className="mt-5">
+            <p className="text-gray-700">
+              👥 <b>{event.currentParticipants}</b> / {event.maxParticipantsCapacity}
+            </p>
+            <div className="w-full bg-gray-200 h-2 rounded-full mt-1">
+              <div
+                className="bg-blue-600 h-2 rounded-full"
+                style={{
+                  width: `${Math.min(
+                    (event.currentParticipants / event.maxParticipantsCapacity) * 100,
+                    100
+                  )}%`,
+                }}
+              ></div>
             </div>
           </div>
 
-          {/* CTA BUTTON */}
-          <div className="mt-8 flex justify-center">
-            <button
-              className="px-8 py-3 text-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md transition"
-            >
-              Register Now
-            </button>
-          </div>
+          {/* ACTION BUTTONS */}
+          <div className="mt-8 flex gap-4">
 
+            {/* Student Buttons */}
+            {role === "student" && (
+              isRegistered ? (
+                <button
+                  onClick={handleCancelRegistration}
+                  className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600"
+                >
+                  Cancel Registration
+                </button>
+              ) : (
+                <button
+                  onClick={handleRegister}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  Register Now
+                </button>
+              )
+            )}
+
+            {/* Admin Buttons */}
+            {role === "admin" && (
+              <>
+                <button
+                  onClick={() => navigate(`/admin/update-event/${id}`)}
+                  className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
+                >
+                  Edit Event
+                </button>
+
+                <button
+                  onClick={handleDeleteEvent}
+                  className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700"
+                >
+                  Delete Event
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default EventDetails;
+export default EventDetailsPage;
