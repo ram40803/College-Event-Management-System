@@ -8,60 +8,74 @@ const registerUser = async (req, res) => {
   const { userId, eventId } = req.body;
 
   try {
-    //Check if user exists
+    // 1. Check user exists
     const user = await getUserById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    //Check if user varify
-    if(!user.is_verified){
-      return res.status(403).json({ message: "User not varify"})
+    // 2. Check user verified
+    if (!user.is_verified) {
+      return res.status(403).json({ message: "User not verified" });
     }
 
-    //Check if event exists
+    // 3. Check event exists
     const event = await getEventById(eventId);
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
     }
 
-    //Check event status
-    // if (event.status.toLowerCase() !== 'open') {
-    //   return res.status(400).json({ message: "Event registration is closed" });
-    // }
+    // 4. Check registration date window
+    const now = new Date();
 
-    //Check if event is full
+    if (now < new Date(event.startRegistrationDate)) {
+      return res.status(400).json({ message: "Registration has not started yet" });
+    }
+
+    if (now > new Date(event.endRegistrationDate)) {
+      return res.status(400).json({ message: "Registration period is over" });
+    }
+
+    // 5. Check capacity
     if (event.currentParticipants >= event.maxParticipants) {
       return res.status(400).json({ message: "Event is full" });
     }
 
-    //Check if user already registered
+    // 6. Check already registered
     const alreadyRegistered = await Registration.findOne({ where: { userId, eventId } });
     if (alreadyRegistered) {
       return res.status(400).json({ message: "User already registered for this event" });
     }
 
-    // Update event participant count (via Event Service)
-    const updatedEvent = await updateEvent(event); // <-- must await this
+    // 7. INCREASE the participant count BEFORE sending to event service
+    const updatedEventPayload = {
+      ...event,
+      currentParticipants: event.currentParticipants + 1
+    };
+
+    // 8. Update event in event-service
+    const updatedEvent = await updateEvent(updatedEventPayload);
+
     if (!updatedEvent) {
       return res.status(500).json({ message: "Failed to update event participant count" });
     }
 
-    // Only if update successful, then create registration
+    // 9. Create registration in local DB
     const registration = await Registration.create({ userId, eventId });
 
     sendRegistrationSuccess(user, event);
-    res.status(201).json({
+
+    return res.status(201).json({
       message: "Registration successful",
       registration
     });
 
   } catch (error) {
-    console.error("Error during registration:", error.message);
-    res.status(500).json({ message: "Error processing registration" });
+    console.error("Error during registration:", error);
+    return res.status(500).json({ message: "Error processing registration" });
   }
-
 };
+
 
 // Get all registrations
 const getAllRegistrations = async (req, res) => {
@@ -72,6 +86,33 @@ const getAllRegistrations = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+// check registration exists having eventId and userId
+const checkRegistration = async (req, res) => {
+  const { eventId, userId } = req.query;
+
+  if (!eventId || !userId) {
+    return res.status(400).json({ message: "eventId and userId are required" });
+  }
+
+  try {
+    const record = await Registration.findOne({
+      where: { eventId, userId }
+    });
+
+    return res.status(200).json({
+      exists: !!record,  // true if found, false if not
+      record
+    });
+
+  } catch (error) {
+    console.error("Error checking registration:", error.message);
+    return res.status(500).json({
+      message: "Internal server error"
+    });
+  }
+};
+
 
 // Get registrations by user
 const getRegistrationsByUser = async (req, res) => {
@@ -140,4 +181,4 @@ const deleteRegistrationsByEventId = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, getAllRegistrations, getRegistrationsByUser, deleteRegistration, deleteRegistrationsByEventId }
+module.exports = { registerUser, getAllRegistrations, getRegistrationsByUser, deleteRegistration, deleteRegistrationsByEventId, checkRegistration }
