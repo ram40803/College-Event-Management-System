@@ -15,6 +15,7 @@ import AdminPromotionTools from "./pages/AdminPromotionTools";
 import AdminCheckIn from "./pages/AdminCheckIn";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import AdminTeam from "./pages/AdminTeam";
+import RegistrationPage from "./pages/RegistrationPage";
 
 export default function App() {
   return (
@@ -39,11 +40,12 @@ export default function App() {
         <Route path="/admin/team" element={<AdminTeam />} />
       </Route>
 
-
         {/* Student Protected Routes */}
         <Route element={<ProtectedRoute role="student" />}>
           <Route path="/user/dashboard" element={<UserDashboard />} />
         </Route>
+
+        <Route path="/registration/:id" element={<RegistrationPage />} />
 
       </Routes>
 
