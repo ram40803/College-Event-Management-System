@@ -1,7 +1,6 @@
 package com.college.event_service.service;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
+import com.college.event_service.Uitel.CloudinaryUtil;
 import com.college.event_service.model.Event;
 import com.college.event_service.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -29,7 +26,7 @@ public class EventService {
     @Autowired
     private final RegistrationService registrationService;
 
-    private final Cloudinary cloudinary;
+    private final CloudinaryUtil cloudinaryUtil;
 
     public String getStatus(Event event) {
         LocalDateTime now = LocalDateTime.now();
@@ -49,25 +46,20 @@ public class EventService {
 
     public String uploadEventImage(MultipartFile file, Long eventId) throws IOException {
 
-        // 1. Upload image to Cloudinary
-        Map uploadResult = cloudinary.uploader().upload(
-                file.getBytes(),
-                ObjectUtils.asMap("folder", "event_images")
-        );
-
-        String imageUrl = uploadResult.get("secure_url").toString();
-
-        // 2. Update event with image URL
         Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found with ID: " + eventId));
+
+        // Delete previous image
+        cloudinaryUtil.deleteImage(event.getImageUrl());
+
+        // Upload new image
+        String imageUrl = cloudinaryUtil.uploadImage(file.getBytes(), "event_images");
 
         event.setImageUrl(imageUrl);
         eventRepo.save(event);
 
-        // 3. Return uploaded image URL
         return imageUrl;
     }
-
 
     public Page<Event> getAllEvents(int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
@@ -80,29 +72,26 @@ public class EventService {
 
     public boolean deleteById(Long eventId) {
         try {
-            // Step 1: Call Registration Service
-            boolean deleted = registrationService.deleteRegistrationsByEvent(eventId);
+            Event event = eventRepo.findById(eventId).orElse(null);
+            if (event == null) return false;
 
-            if (!deleted) {
-                System.err.println("❌ Registration deletion failed. Event not deleted.");
+            // 1. Delete registrations
+            if (!registrationService.deleteRegistrationsByEvent(eventId)) {
                 return false;
             }
 
-            // Step 2: Delete event from DB
-            if (eventRepo.existsById(eventId)) {
-                eventRepo.deleteById(eventId);
-                System.out.println("✅ Event deleted successfully: " + eventId);
-                return true;
-            }
+            // 2. Delete image from Cloudinary
+            cloudinaryUtil.deleteImage(event.getImageUrl());
 
-            return false;
+            // 3. Delete event itself
+            eventRepo.deleteById(eventId);
+
+            return true;
 
         } catch (Exception e) {
-            System.err.println("Error deleting event: " + e.getMessage());
             return false;
         }
     }
-
 
     public void updateEvent(Long id, Event updatedEvent) {
         eventRepo.findById(id).map(event -> {
@@ -118,6 +107,10 @@ public class EventService {
                 event.setStartDate(updatedEvent.getStartDate());
             if(updatedEvent.getEndDate() != null)
                 event.setEndDate(updatedEvent.getEndDate());
+            if(updatedEvent.getStartRegistrationDate() != null)
+                event.setStartRegistrationDate(updatedEvent.getStartRegistrationDate());
+            if(updatedEvent.getEndRegistrationDate() != null)
+                event.setEndRegistrationDate(updatedEvent.getEndRegistrationDate());
             if(updatedEvent.getLocation() != null)
                 event.setLocation(updatedEvent.getLocation());
             if(updatedEvent.getOrganizer() != null)

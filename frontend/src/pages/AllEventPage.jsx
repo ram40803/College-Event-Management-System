@@ -3,10 +3,9 @@ import EventCard from "../components/EventCard";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
-const EventSection = () => {
+const AllEventsPage = () => {
   const navigate = useNavigate();
 
-  // STATES
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,7 +13,7 @@ const EventSection = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const [keyword, setKeyword] = useState("");
-  const [filter, setFilter] = useState("ALL"); // ALL | UPCOMING | ONGOING | COMPLETED
+  const [filter, setFilter] = useState("ALL");
 
   const [message, setMessage] = useState("");
 
@@ -28,19 +27,18 @@ const EventSection = () => {
     try {
       setLoading(true);
 
-      let url = `/event-service/events?page=${pageNum}&size=6`;
+      let url = `/event-service/events?page=${pageNum}&size=12`;
 
-      // Apply search
+      // If user is searching
       if (keyword.trim() !== "") {
-        url = `/event-service/events/search?keyword=${keyword}&page=${pageNum}&size=6`;
+        url = `/event-service/events/search?keyword=${keyword}&page=${pageNum}&size=12`;
       }
 
-      // Fetch data
       const response = await api.get(url);
 
       let data = response.data.content;
 
-      // Apply filter manually (backend doesn't support)
+      // Apply frontend filtering logic
       data = data.filter((e) => {
         const now = new Date();
         const start = new Date(e.startDate);
@@ -49,6 +47,7 @@ const EventSection = () => {
         if (filter === "UPCOMING") return now < start;
         if (filter === "ONGOING") return now >= start && now <= end;
         if (filter === "COMPLETED") return now > end;
+
         return true;
       });
 
@@ -63,12 +62,11 @@ const EventSection = () => {
   };
 
   const handleDeleteEvent = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this event?")) return;
+    if (!window.confirm("Delete this event?")) return;
 
     try {
       await api.delete(`/event-service/events/${id}`);
-
-      setMessage("Event deleted successfully!");
+      setMessage("Event deleted successfully.");
       loadEvents(page);
 
       setTimeout(() => setMessage(""), 3000);
@@ -93,32 +91,28 @@ const EventSection = () => {
         </div>
       )}
 
-      {/* Header */}
+      {/* Title */}
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
         All Events
       </h1>
 
-      {/* Search + Filter Row */}
+      {/* Search + Filters */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
 
-        {/* Search Bar + Button */}
-        <div className="flex md:flex-row items-center gap-3 w-full mx-auto">
+        {/* Search bar */}
+        <div className="flex items-center gap-3 w-full md:w-2/3">
+          <input
+            type="text"
+            placeholder="Search events..."
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none"
+          />
 
-          <div className="w-full md:w-1/3">
-            <input
-              type="text"
-              placeholder="Search events..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none"
-            />
-          </div>
-
-          {/* Search Button */}
           <button
             onClick={handleSearch}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Search
           </button>
@@ -130,10 +124,11 @@ const EventSection = () => {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium ${filter === f
+              className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                filter === f
                   ? "bg-blue-600 text-white"
                   : "bg-white border hover:bg-gray-100"
-                }`}
+              }`}
             >
               {f}
             </button>
@@ -141,7 +136,7 @@ const EventSection = () => {
         </div>
       </div>
 
-      {/* Events */}
+      {/* Events Grid */}
       {loading ? (
         <p className="text-center text-gray-600">Loading events...</p>
       ) : events.length === 0 ? (
@@ -151,21 +146,43 @@ const EventSection = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.map((event) => (
               <div key={event.id} className="relative">
-                {/* Event Card */}
+                
+                {/* Event Card Component */}
                 <EventCard event={event} />
+
+                {/* Admin Buttons (Inside Grid) */}
+                {isAdmin && (
+                  <div className="flex justify-between mt-2">
+                    <button
+                      onClick={() => navigate(`/events/update/${event.id}`)}
+                      className="px-4 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteEvent(event.id)}
+                      className="px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
 
           {/* Pagination */}
           <div className="flex justify-center items-center gap-4 mt-10">
+            
+            {/* Previous */}
             <button
               disabled={page === 0}
               onClick={() => setPage(page - 1)}
-              className={`px-6 py-2 rounded-lg border ${page === 0
+              className={`px-6 py-2 rounded-lg border ${
+                page === 0
                   ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                   : "bg-white hover:bg-gray-100"
-                }`}
+              }`}
             >
               Previous
             </button>
@@ -174,13 +191,15 @@ const EventSection = () => {
               Page {page + 1} of {totalPages}
             </span>
 
+            {/* Next */}
             <button
               disabled={page >= totalPages - 1}
               onClick={() => setPage(page + 1)}
-              className={`px-6 py-2 rounded-lg border ${page >= totalPages - 1
+              className={`px-6 py-2 rounded-lg border ${
+                page >= totalPages - 1
                   ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                   : "bg-white hover:bg-gray-100"
-                }`}
+              }`}
             >
               Next
             </button>
@@ -191,6 +210,4 @@ const EventSection = () => {
   );
 };
 
-export default EventSection;
-
-
+export default AllEventsPage;
