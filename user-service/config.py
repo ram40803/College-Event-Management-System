@@ -17,8 +17,8 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "change_this_secret")
     OTP_EXPIRY_MINUTES = int(os.getenv("OTP_EXPIRY_MINUTES", "5"))
     SERVICE_NAME = os.getenv("SERVICE_NAME", "user-service")
-    SERVICE_PORT = int(os.getenv("SERVICE_PORT", 5001))
-    HOST = os.getenv("HOST", "localhost")
+    SERVICE_PORT = int(os.getenv("SERVICE_PORT", 8082))
+    HOST = os.getenv("HOST", "user-service")
     EUREKA_SERVER = os.getenv("EUREKA_SERVER", "http://localhost:8761/eureka")
 
 

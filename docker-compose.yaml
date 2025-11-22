@@ -1,32 +1,32 @@
 version: '3.8'
 
 services:
-  # 1. Spring Boot Service Registry (Eureka)
+
+  # 1. Eureka Service Registry
   service-registry:
-    # Points to the Dockerfile in the 'service-registry' folder
     build:
-      context: ./service-registry 
+      context: ./service-registry
       dockerfile: Dockerfile
     container_name: service-registry-container
     ports:
-      - "8761:8761" 
+      - "8761:8761"
+    networks:
+      - microservice-net
+    restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8761/"]
       interval: 5s
       timeout: 2s
       retries: 10
-    networks:
-      - microservice-net
-    restart: always
 
-  # 2. spring boot api gateway
+  # 2. API Gateway
   api-gateway:
     build:
       context: ./api-gateway
       dockerfile: Dockerfile
     container_name: api-gateway-container
     ports:
-      - "8080:8080" 
+      - "8080:8080"
     networks:
       - microservice-net
     depends_on:
@@ -34,7 +34,7 @@ services:
         condition: service_healthy
     restart: always
 
-  # 3. Spring Boot Event Service
+  # 3. Event Service (Spring Boot)
   event-service:
     build:
       context: ./event-service
@@ -42,17 +42,22 @@ services:
     container_name: event-service-container
     ports:
       - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_URL: ${EVENT_DB_URL}
+      DB_USERNAME: ${EVENT_DB_USERNAME}
+      DB_PASSWORD: ${EVENT_DB_PASSWORD}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
     networks:
       - microservice-net
     depends_on:
       service-registry:
         condition: service_healthy
-    environment:
-      # Use the 'dev' profile for configuration specific to the development environment
-      - SPRING_PROFILES_ACTIVE=dev
+    restart: always
 
-
-  # 4. Flask User Service
+  # 4. User Service (Flask)
   user-service:
     build:
       context: ./user-service
@@ -60,18 +65,16 @@ services:
     container_name: user-service-container
     ports:
       - "8082:8082"
+    environment:
+      HOST: user-service
+      MONGO_URI: ${USER_MONGO_URI}
+      SECRET_KEY: ${USER_SECRET_KEY}
+      OTP_EXPIRY_MINUTES: ${USER_OTP_EXPIRY_MINUTES}
+      EUREKA_SERVER: http://service-registry:8761/eureka
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_TOPIC: ${KAFKA_TOPIC}
     networks:
       - microservice-net
-    environment:
-      - SERVICE_NAME=user-service
-      - SERVICE_PORT=8082
-      - HOST=user-service
-      - MONGO_URI=mongodb://host.docker.internal:27017/user_db
-      - SECRET_KEY=supersecretkey
-      - OTP_EXPIRY_MINUTES=5
-      - EUREKA_SERVER=http://service-registry:8761/eureka
-      - KAFKA_BROKER=kafka:9092
-      - KAFKA_TOPIC=notifications
     depends_on:
       service-registry:
         condition: service_healthy
@@ -88,16 +91,16 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - PORT=8083
-      - DB_HOST=host.docker.internal
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=Ram@2208
-      - DB_NAME=registrationdb
-      - EUREKA_HOST=service-registry
-      - EUREKA_PORT=8761
-      - KAFKA_BROKER=kafka:9092
-      - KAFKA_TOPIC=notifications
+      PORT: 8083
+      DB_HOST: ${REG_DB_HOST}
+      DB_PORT: ${REG_DB_PORT}
+      DB_USER: ${REG_DB_USER}
+      DB_PASSWORD: ${REG_DB_PASSWORD}
+      DB_NAME: ${REG_DB_NAME}
+      EUREKA_HOST: service-registry
+      EUREKA_PORT: 8761
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_TOPIC: ${KAFKA_TOPIC}
     networks:
       - microservice-net
     depends_on:
@@ -105,7 +108,7 @@ services:
         condition: service_healthy
     restart: always
 
-  # Zookeeper (required by Kafka)
+  # 6. Zookeeper
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
     container_name: zookeeper
@@ -123,7 +126,7 @@ services:
     networks:
       - microservice-net
 
-  # Kafka Broker
+  # 7. Kafka
   kafka:
     image: confluentinc/cp-kafka:7.3.0
     container_name: kafka
@@ -142,7 +145,7 @@ services:
     networks:
       - microservice-net
 
-  # 6. Node notification Service
+  # 8. Notification Service (Node)
   notification-service:
     build:
       context: ./notification-service
@@ -151,12 +154,12 @@ services:
     ports:
       - "8084:8084"
     environment:
-      - KAFKA_BROKER=kafka:9092
-      - KAFKA_TOPIC=notifications
-      - EMAIL_USER=iipsacademicspotal@gmail.com
-      - EMAIL_PASS=bmncwgkgjvzfovmh
-      - EUREKA_HOST=service-registry
-      - EUREKA_PORT=8761
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_TOPIC: ${KAFKA_TOPIC}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
+      EUREKA_HOST: service-registry
+      EUREKA_PORT: 8761
     networks:
       - microservice-net
     depends_on:
@@ -166,6 +169,7 @@ services:
         condition: service_started
     restart: always
 
+  # 9. Frontend
   frontend:
     build:
       context: ./frontend
@@ -179,4 +183,3 @@ services:
 networks:
   microservice-net:
     driver: bridge
-    
