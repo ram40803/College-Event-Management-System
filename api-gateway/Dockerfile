@@ -16,6 +16,7 @@ RUN ./mvnw dependency:go-offline -B
 COPY src src
 
 # Package the application into a runnable JAR file
+RUN chmod +x mvnw
 RUN ./mvnw package -DskipTests
 
 # ----------------------------------------------------------------------------------
