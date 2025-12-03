@@ -15,6 +15,9 @@ import AdminPromotionTools from "./pages/AdminPromotionTools";
 import AdminCheckIn from "./pages/AdminCheckIn";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import AdminTeam from "./pages/AdminTeam";
+import EventDetails from "./pages/EventDetails";
+import UpdateEventPage from "./pages/UpdateEventPage";
+import AllEventsPage from "./pages/AllEventPage";
 
 export default function App() {
   return (
@@ -47,7 +50,7 @@ export default function App() {
           <Route path="/user/dashboard" element={<UserDashboard />} />
         </Route>
 
-        <Route path="/registration/:id" element={<RegistrationPage />} />
+        {/* <Route path="/registration/:id" element={<RegistrationPage />} /> */}
 
       </Routes>
 

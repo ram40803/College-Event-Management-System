@@ -10,12 +10,14 @@ COPY .mvn .mvn
 COPY pom.xml .
 
 # Download dependencies (cached layer)
+RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline -B
 
 # Copy the rest of the source code
 COPY src src
 
 # Package the application into a runnable JAR file
+RUN chmod +x mvnw
 RUN ./mvnw package -DskipTests
 
 # ----------------------------------------------------------------------------------
